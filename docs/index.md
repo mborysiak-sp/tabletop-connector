@@ -1,7 +1,6 @@
 # tabletop-connector
 
 [![Build Status](https://travis-ci.org/mborysiak-sp/tabletop-connector.svg?branch=master)](https://travis-ci.org/mborysiak-sp/tabletop-connector)
-[![Built with](https://img.shields.io/badge/Built_with-Cookiecutter_Django_Rest-F7B633.svg)](https://github.com/agconti/cookiecutter-django-rest)
 
 None. Check out the project's [documentation](http://mborysiak-sp.github.io/tabletop-connector/).
 

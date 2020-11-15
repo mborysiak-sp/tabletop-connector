@@ -1,0 +1,5 @@
+DJANGO_SECRET_KEY="f2c&!0uwkin)6)d1&(9a3bw1yyen*_uv&y_d801!+=4x#=9g(d"
+POSTGRES_DB="postgres"
+POSTGRES_USER="postgres"
+DATABASE_URL="postgres://postgres:postgres1234@postgres:5432/postgres"
+POSTGRES_PASSWORD="postgres1234"

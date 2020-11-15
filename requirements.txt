@@ -17,7 +17,7 @@ django_unique_upload==0.2.1
 djangorestframework==3.12.1
 Markdown==3.3.2
 django-filter==2.4.0
-
+djoser==2.1.0
 # Developer Tools
 ipdb==0.13.4
 ipython==7.18.1
