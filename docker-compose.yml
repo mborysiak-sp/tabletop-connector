@@ -3,10 +3,10 @@ version: '2'
 services:
   postgres:
     image: postgres:13
-    env_file: env_dev
+    env_file: .env
   web:
     restart: always
-    env_file: env_dev
+    env_file: .env
     image: web
     build: ./
     command: >
