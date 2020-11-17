@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Event
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -23,3 +23,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email', 'auth_token',)
         read_only_fields = ('auth_token',)
         extra_kwargs = {'password': {'write_only': True}}
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'date', 'creator', 'address', 'chat',)
+
