@@ -26,6 +26,9 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+
+
+
     class Meta:
         model = Event
         fields = ('id', 'name', 'date', 'creator', 'address', 'chat',)

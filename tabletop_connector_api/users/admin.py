@@ -4,6 +4,8 @@ from .models import User, Event
 
 
 @admin.register(User)
-@admin.register(Event)
 class UserAdmin(UserAdmin):
     pass
+
+
+admin.site.register(Event)

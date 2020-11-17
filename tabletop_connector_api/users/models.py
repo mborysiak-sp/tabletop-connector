@@ -19,7 +19,8 @@ class Game(models.Model):
 
 
 class Address(models.Model):
-    pass
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    c
 
 
 class Chat(models.Model):
