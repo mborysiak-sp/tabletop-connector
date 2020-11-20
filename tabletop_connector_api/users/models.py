@@ -20,7 +20,11 @@ class Game(models.Model):
 
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    c
+    country = models.CharField(max_length=64)
+    city = models.CharField(max_length=64)
+    street = models.CharField(max_length=128)
+    postal_code = models.CharField(max_length=6)
+    number = models.CharField(max_length=64)
 
 
 class Chat(models.Model):

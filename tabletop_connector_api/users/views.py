@@ -3,9 +3,9 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import User, Event
+from .models import User, Event, Address
 from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer, UserSerializer, EventSerializer
+from .serializers import CreateUserSerializer, UserSerializer, EventSerializer, AddressSerializer
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -27,6 +27,12 @@ class UserCreateViewSet(mixins.CreateModelMixin,
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
     permission_classes = (AllowAny,)
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
 
 
 class EventViewSet(viewsets.ModelViewSet):
