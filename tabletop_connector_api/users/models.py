@@ -1,10 +1,9 @@
 import uuid
-from django.db import models
+
 from django.conf import settings
-from django.dispatch import receiver
+from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_save
-from rest_framework.authtoken.models import Token
+
 
 
 class User(AbstractUser):
@@ -14,7 +13,30 @@ class User(AbstractUser):
         return self.username
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
+class Game(models.Model):
+    id = models.IntegerField(primary_key=True)
+    #users = models.ForeignKey(User, on_delete=)
+
+
+class Address(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    country = models.CharField(max_length=64)
+    city = models.CharField(max_length=64)
+    street = models.CharField(max_length=128)
+    postal_code = models.CharField(max_length=6)
+    number = models.CharField(max_length=64)
+
+
+class Chat(models.Model):
+    pass
+
+
+class Event(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64)
+    date = models.DateTimeField()
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
+    chat = models.ForeignKey(Chat, null=True, on_delete=models.SET_NULL)
+
+
