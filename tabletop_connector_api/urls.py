@@ -1,14 +1,12 @@
-from django.conf import settings
 from django.urls import path, include
-from django.conf.urls.static import static
 from django.contrib import admin
 
-from .users import views as user_views
-from .events import views as event_views
+from .users import urls as user_urls
+from .events import urls as event_urls
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    include(user_views),
-    include(event_views)
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('users/', include(user_urls)),
+    path('events/', include(event_urls))
+]
