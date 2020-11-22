@@ -3,12 +3,14 @@ from os.path import join
 from distutils.util import strtobool
 import dj_database_url
 from configurations import Configuration
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class Common(Configuration):
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -21,12 +23,13 @@ class Common(Configuration):
         'rest_framework.authtoken',  # token authentication
         'django_filters',            # for filtering rest endpoints
         'djoser',
-        # Your apps
+        # Project apps
         'tabletop_connector_api.users',
-    )
+        'tabletop_connector_api.events',
+    ]
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
-    MIDDLEWARE = (
+    MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -34,11 +37,11 @@ class Common(Configuration):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
+    ]
 
     ALLOWED_HOSTS = ["*"]
     ROOT_URLCONF = 'tabletop_connector_api.urls'
-    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default="2137")
     WSGI_APPLICATION = 'tabletop_connector_api.wsgi.application'
 
     # Email
@@ -193,7 +196,10 @@ class Common(Configuration):
             'rest_framework.permissions.IsAuthenticated',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.SessionAuthentication',
-            'rest_framework.authentication.TokenAuthentication',
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
         )
+    }
+
+    SIMPLE_JWT = {
+       'AUTH_HEADER_TYPES': ('JWT',),
     }

@@ -10,7 +10,7 @@ psycopg2-binary==2.8.6
 dj-database-url==0.5.0
 
 # Development tools
-django-debug-toolbar==3.1.1
+
 
 # Model Tools
 django-model-utils==4.0.0
@@ -21,6 +21,7 @@ djangorestframework==3.12.1
 Markdown==3.3.2
 django-filter==2.4.0
 djoser==2.1.0
+djangorestframework_simplejwt==4.6.0
 # Developer Tools
 ipdb==0.13.4
 ipython==7.18.1
