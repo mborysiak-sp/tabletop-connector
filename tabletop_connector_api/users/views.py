@@ -1,12 +1,9 @@
 from djoser.serializers import UserSerializer
 from rest_framework import viewsets, mixins, views
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
 
-
-from .models import User
+from .models import User, Profile
 from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer
+from .serializers import ProfileSerializer
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -20,10 +17,13 @@ class UserViewSet(mixins.RetrieveModelMixin,
     permission_classes = (IsUserOrReadOnly,)
 
 
-class UserCreateView(CreateAPIView):
+class ProfileViewSet(mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin,
+                     mixins.UpdateModelMixin,
+                     viewsets.GenericViewSet):
     """
-    Creates user accounts
+    Updates and retrieves user accounts
     """
-    queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
-    permission_classes = (AllowAny,)
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = (IsUserOrReadOnly,)
