@@ -25,6 +25,7 @@ class Common(Configuration):
         'djoser',
         # Project apps
         'tabletop_connector_api.users',
+        'tabletop_connector_api.events',
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
@@ -40,7 +41,7 @@ class Common(Configuration):
 
     ALLOWED_HOSTS = ["*"]
     ROOT_URLCONF = 'tabletop_connector_api.urls'
-    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default="2137")
     WSGI_APPLICATION = 'tabletop_connector_api.wsgi.application'
 
     # Email
