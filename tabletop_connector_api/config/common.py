@@ -10,7 +10,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class Common(Configuration):
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -26,10 +26,10 @@ class Common(Configuration):
         # Project apps
         'tabletop_connector_api.users',
         'tabletop_connector_api.events',
-    )
+    ]
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
-    MIDDLEWARE = (
+    MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -37,7 +37,7 @@ class Common(Configuration):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
+    ]
 
     ALLOWED_HOSTS = ["*"]
     ROOT_URLCONF = 'tabletop_connector_api.urls'

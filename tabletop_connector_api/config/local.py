@@ -8,11 +8,8 @@ class Local(Common):
 
     # Testing
     INSTALLED_APPS = Common.INSTALLED_APPS
-    INSTALLED_APPS += ('django_nose',
-                       'debug_toolbar',)
 
     MIDDLEWARE = Common.MIDDLEWARE
-    MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_ARGS = [
