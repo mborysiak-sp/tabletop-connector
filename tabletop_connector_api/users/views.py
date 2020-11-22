@@ -1,8 +1,12 @@
-from rest_framework import viewsets, mixins
+from djoser.serializers import UserSerializer
+from rest_framework import viewsets, mixins, views
+from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
+
+
 from .models import User
 from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer, UserSerializer
+from .serializers import CreateUserSerializer
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -16,8 +20,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
     permission_classes = (IsUserOrReadOnly,)
 
 
-class UserCreateViewSet(mixins.CreateModelMixin,
-                        viewsets.GenericViewSet):
+class UserCreateView(CreateAPIView):
     """
     Creates user accounts
     """
