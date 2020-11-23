@@ -1,27 +1,22 @@
-import os
-from .common import Common
+from .common import *
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-class Local(Common):
-    DEBUG = True
+DEBUG = True
 
-    # Testing
-    INSTALLED_APPS = Common.INSTALLED_APPS
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    BASE_DIR,
+    '-s',
+    '--nologcapture',
+    '--with-coverage',
+    '--with-progressive',
+    '--cover-package=tabletop_connector_api'
+]
 
-    MIDDLEWARE = Common.MIDDLEWARE
-
-    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-    NOSE_ARGS = [
-        BASE_DIR,
-        '-s',
-        '--nologcapture',
-        '--with-coverage',
-        '--with-progressive',
-        '--cover-package=tabletop_connector_api'
-    ]
-
-    # Mail
-    EMAIL_HOST = 'localhost'
-    EMAIL_PORT = 1025
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Mail
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
