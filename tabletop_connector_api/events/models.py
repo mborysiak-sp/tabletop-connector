@@ -15,6 +15,12 @@ class Address(models.Model):
     postal_code = models.CharField(max_length=6)
     number = models.CharField(max_length=64)
 
+    def __str__(self):
+        return self.country.__str__() + " " \
+               + self.city.__str__() + " " \
+               + self.street.__str__() + " " \
+               + self.number.__str__() + " " \
+               + self.postal_code.__str__()
 
 class Chat(models.Model):
     pass
