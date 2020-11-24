@@ -13,7 +13,8 @@ class AddressViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-
+    authentication_classes = ()
+    permission_classes = ()
     # def list(self, request):
     # events = Event.objects.all()
     # serializer = EventSerializer(events, many=True)

@@ -10,7 +10,8 @@ services:
     image: web
     build: ./
     command: >
-      bash -c "./manage.py migrate &&
+      bash -c "./manage.py makemigrations &&
+               ./manage.py migrate &&
                pytest  &&
                ./manage.py runserver 0.0.0.0:8000"
     volumes:
