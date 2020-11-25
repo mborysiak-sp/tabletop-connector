@@ -1,4 +1,6 @@
-from tabletop_connector_api.events.utils import address_to_geocode
+import math
+
+from tabletop_connector_api.events.utils import address_to_geocode, get_distance_in_kilometers
 
 
 def test_valid_address():
@@ -23,3 +25,16 @@ def test_invalid_address():
     }
 
     assert address_to_geocode(valid_dict) == ()
+
+
+def test_get_distance_in_kilometers_with_zeros():
+
+    assert get_distance_in_kilometers(0, 0, 0, 0) == 0
+
+
+def test_get_distance_in_kilometers_same_sign():
+    assert abs(get_distance_in_kilometers(10, 10, 20, 20) - 1544.68) < .1
+
+
+def test_get_distance_in_kilometers_different_sign():
+    assert abs(get_distance_in_kilometers(-10, 10, 10, -10) - 3137.04) < .1

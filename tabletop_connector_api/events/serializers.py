@@ -32,6 +32,4 @@ class EventSerializer(serializers.ModelSerializer):
         address_data['geo_x'] = geocode[0]
         address_data['geo_y'] = geocode[1]
         created_address = Address.objects.create(**address_data)
-        #created_address.geo_x = geocode[0]
-        #created_address.geo_y = geocode[1]
-        return Event.objects.create(address=created_address.pk, **validated_data)
+        return Event.objects.create(address=created_address, **validated_data)
