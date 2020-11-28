@@ -1,4 +1,4 @@
-import math
+
 
 from tabletop_connector_api.events.utils import address_to_geocode, get_distance_in_kilometers
 
@@ -6,9 +6,19 @@ from tabletop_connector_api.events.utils import address_to_geocode, get_distance
 def test_valid_address():
     valid_dict = {
         "country": "Poland",
+        "city": "Gdynia",
+        "street": "2 morskiego pulku strzelcow",
+        "postal_code": "81-661",
+        "number": "6"
+    }
+
+    assert address_to_geocode(valid_dict) == (54.491011150000006, 18.511290835245834)
+
+
+def test_valid_address_shortened():
+    valid_dict = {
         "city": "Gdansk",
         "street": "Wita Stwosza",
-        "postal_code": "80-306",
         "number": "57"
     }
 

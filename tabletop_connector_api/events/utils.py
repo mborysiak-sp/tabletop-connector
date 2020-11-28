@@ -1,15 +1,15 @@
 import math
 
+
 from geopy.geocoders import Nominatim
 
 
 def address_to_geocode(address: dict):
-
-    result = Nominatim(user_agent="xd").geocode(address.get("country") + " "
-                               + address.get("city") + " "
-                               + address.get("postal_code") + " "
-                               + address.get("street") + " "
-                               + address.get("number"))
+    result = Nominatim(user_agent="xd").geocode(address.get("country", [""])[0] + " "
+                                                + address.get("city", [""])[0] + " "
+                                                # + address.get("postal_code", "") + " "
+                                                + address.get("street", [""])[0] + " "
+                                                + address.get("number", [""])[0])
 
     try:
         return result.latitude, result.longitude
