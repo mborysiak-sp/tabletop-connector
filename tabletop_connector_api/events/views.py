@@ -3,6 +3,8 @@
 from rest_framework import viewsets, generics, mixins, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+
+from .filters import FilterByDistance
 from .models import Address, Event
 from .serializers import AddressSerializer, EventSerializer
 from .utils import address_to_geocode, get_distance_in_kilometers
@@ -28,20 +30,8 @@ class CustomEventViewSet(ListAPIView):
 
     def get_queryset(self):
 
-        distance = float(self.request.query_params.get('distance', 0.0))
-        address_data = dict(self.request.query_params)
-        address_data.pop('distance', 0.0)
-        geocode_from = address_to_geocode(address_data)
+        queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
 
-        if geocode_from == ():
-            queryset = Event.objects.none()
-            return queryset
-
-        nearly_events = [x.id for x in Event.objects.all() if get_distance_in_kilometers(x.address.geo_x,
-                                                                                         x.address.geo_y,
-                                                                                         geocode_from[0],
-                                                                                         geocode_from[1]) < distance]
-        queryset = Event.objects.filter(id__in=nearly_events)
         return queryset
 
     def get(self, *args, **kwargs):
