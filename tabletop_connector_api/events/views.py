@@ -1,8 +1,13 @@
 # Create your views here.
-from rest_framework import viewsets
 
+from rest_framework import viewsets, generics, mixins, status
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+
+from .filters import FilterByDistance
 from .models import Address, Event
 from .serializers import AddressSerializer, EventSerializer
+from .utils import address_to_geocode, get_distance_in_kilometers
 
 
 class AddressViewSet(viewsets.ModelViewSet):
@@ -13,6 +18,30 @@ class AddressViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    authentication_classes = ()
+    permission_classes = ()
+
+
+class CustomEventViewSet(ListAPIView):
+    authentication_classes = ()
+    permission_classes = ()
+    serializer_class = EventSerializer
+    model = serializer_class.Meta.model
+
+    def get_queryset(self):
+
+        queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
+
+        return queryset
+
+    def get(self, *args, **kwargs):
+
+        queryset = self.get_queryset()
+        if queryset.count() == 0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = self.serializer_class(queryset, many=True)
+            return Response(data=serializer.data, status=status.HTTP_302_FOUND)
 
     # def list(self, request):
     # events = Event.objects.all()
