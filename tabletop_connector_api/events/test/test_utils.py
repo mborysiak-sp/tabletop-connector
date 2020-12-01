@@ -27,11 +27,11 @@ def test_valid_address_shortened():
 
 def test_invalid_address():
     valid_dict = {
-        "country": ["xD"],
-        "city": ["xD"],
-        "street": ["xD"],
-        "postal_code": ["21-037"],
-        "number": ["222"]
+        "country": [""],
+        "city": [""],
+        "street": [""],
+        "postal_code": [""],
+        "number": [""]
     }
 
     assert address_to_geocode(valid_dict) == ()

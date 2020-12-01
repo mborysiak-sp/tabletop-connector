@@ -12,7 +12,7 @@ services:
     command: >
       bash -c "./manage.py makemigrations &&
                ./manage.py migrate &&
-               pytest  &&
+               pytest &&
                ./manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./:/code
