@@ -40,12 +40,11 @@ class AddressViewSet(viewsets.ViewSet):
         pass
 
     def destroy(self, request, pk=None):
+
         address = Address.objects.get(pk=pk)
-        serializer = self.serializer_class(address, data=request.data)
-        if serializer.is_valid():
-            address.delete()
-            return Response(serializer.data, status=status.HTTP_410_GONE)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        address.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 class EventViewSet(viewsets.ViewSet):
@@ -54,10 +53,12 @@ class EventViewSet(viewsets.ViewSet):
     permission_classes = ()
 
     def list(self, request):
+
         serializer = self.serializer_class(Event.objects.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -66,10 +67,12 @@ class EventViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
+
         event = get_object_or_404(Event.objects.all(), pk=pk)
         return Response(self.serializer_class(event).data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
+
         event = Event.objects.get(pk=pk)
         serializer = self.serializer_class(event, data=request.data)
         if serializer.is_valid():
@@ -83,15 +86,14 @@ class EventViewSet(viewsets.ViewSet):
         pass
 
     def destroy(self, request, pk=None):
-        event = Event.objects.get(pk=pk)
-        serializer = self.serializer_class(event, data=request.data)            # data to remove
-        if serializer.is_valid():                                               # also to remove then
-            event.delete()
-            return Response(serializer.data, status=status.HTTP_410_GONE)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # this too
+
+        event = Event.objects.get(pk=pk)                                     # also to remove then
+        event.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomEventViewSet(ListAPIView):
+
     authentication_classes = ()
     permission_classes = ()
     serializer_class = EventSerializer
