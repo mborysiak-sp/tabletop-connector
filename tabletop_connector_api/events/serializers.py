@@ -14,7 +14,6 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = ('id', 'country', 'city', 'street', 'postal_code', 'number', 'geo_x', 'geo_y', )
 
 
-
 class EventSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer(many=False)
@@ -36,7 +35,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
 
-        address_data = validated_data.pop('address')
+        address_data = validated_data.get('address', instance.address)
         geocode = address_to_geocode(address_data)
         if geocode == ():
             return None
@@ -46,4 +45,5 @@ class EventSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.date = validated_data.get('date', instance.date)
         instance.address = created_address
+        instance.save()
         return instance

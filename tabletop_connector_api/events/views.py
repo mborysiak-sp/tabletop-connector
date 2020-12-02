@@ -54,7 +54,7 @@ class EventViewSet(viewsets.ViewSet):
     permission_classes = ()
 
     def list(self, request):
-        serializer = EventSerializer(Event.objects.all(), many=True)
+        serializer = self.serializer_class(Event.objects.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
@@ -73,7 +73,9 @@ class EventViewSet(viewsets.ViewSet):
         event = Event.objects.get(pk=pk)
         serializer = self.serializer_class(event, data=request.data)
         if serializer.is_valid():
+            print(Event.objects.all())
             serializer.save()
+            print(Event.objects.all())
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -82,7 +84,9 @@ class EventViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        serializer = self.serializer_class(event, data=request.data)
+        print(request.data)
+        print(pk)
+        serializer = self.serializer_class(event)
         if serializer.is_valid():
             event.delete()
             return Response(serializer.data, status=status.HTTP_410_GONE)
