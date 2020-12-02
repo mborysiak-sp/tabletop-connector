@@ -84,13 +84,11 @@ class EventViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        print(request.data)
-        print(pk)
-        serializer = self.serializer_class(event)
-        if serializer.is_valid():
+        serializer = self.serializer_class(event, data=request.data)            # data to remove
+        if serializer.is_valid():                                               # also to remove then
             event.delete()
             return Response(serializer.data, status=status.HTTP_410_GONE)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # this too
 
 
 class CustomEventViewSet(ListAPIView):
