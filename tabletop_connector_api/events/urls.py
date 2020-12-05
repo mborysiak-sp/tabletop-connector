@@ -6,8 +6,8 @@ from rest_framework.routers import DefaultRouter
 from .views import EventViewSet, AddressViewSet, CustomEventViewSet
 
 router = DefaultRouter()
-router.register(r'events', EventViewSet, 'event')
-router.register(r'addresses', AddressViewSet, 'address')
+router.register(r'events', EventViewSet, basename='event')
+router.register(r'addresses', AddressViewSet, basename='address')
 
 app_name = 'events'
 urlpatterns = [
