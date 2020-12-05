@@ -46,7 +46,6 @@ class AddressViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 class EventViewSet(viewsets.ViewSet):
     serializer_class = EventSerializer
     authentication_classes = ()
@@ -67,8 +66,8 @@ class EventViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-
         event = get_object_or_404(Event.objects.all(), pk=pk)
+
         return Response(self.serializer_class(event).data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
@@ -76,9 +75,7 @@ class EventViewSet(viewsets.ViewSet):
         event = Event.objects.get(pk=pk)
         serializer = self.serializer_class(event, data=request.data)
         if serializer.is_valid():
-            print(Event.objects.all())
             serializer.save()
-            print(Event.objects.all())
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
