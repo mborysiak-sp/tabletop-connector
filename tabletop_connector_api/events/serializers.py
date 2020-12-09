@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Address, Event
+from .models import Address, Event, Game
 from .utils import address_to_geocode
 
 
@@ -33,3 +33,10 @@ class EventSerializer(serializers.ModelSerializer):
         address_data['geo_y'] = geocode[1]
         created_address = Address.objects.create(**address_data)
         return Event.objects.create(address=created_address, **validated_data)
+
+
+class GameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Game
+        fields = '__all__'

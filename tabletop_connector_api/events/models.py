@@ -1,9 +1,9 @@
 import uuid
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
-# Create your models here.
 from tabletop_connector_api.users.models import User
 
 
@@ -29,6 +29,15 @@ class Chat(models.Model):
     pass
 
 
+class Game(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128)
+    image = models.CharField(max_length=512)
+    min_players = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+    max_players = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+    playtime = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)])
+
+
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
@@ -36,3 +45,4 @@ class Event(models.Model):
     creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
     chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.SET_NULL)
+    games = models.ManyToManyField(Game, related_name='games', related_query_name='games')

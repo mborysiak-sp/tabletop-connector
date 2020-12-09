@@ -28,4 +28,3 @@ def get_distance_in_kilometers(from_lat, from_long, to_lat, to_long):
     c = 2 * math.atan2(a**0.5, (1-a)**0.5)
 
     return R * c / 1000
-
