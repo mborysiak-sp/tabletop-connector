@@ -45,7 +45,8 @@ class CustomEventAPIView(ListAPIView):
 class GameViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('name', )
+    filter_backends = [filters.SearchFilter]
+    filter_class = Game
+    search_fields = ['name']
     authentication_classes = ()
     permission_classes = ()
