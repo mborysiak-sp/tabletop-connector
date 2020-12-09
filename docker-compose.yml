@@ -12,6 +12,7 @@ services:
     command: >
       bash -c "./manage.py makemigrations &&
                ./manage.py migrate &&
+               ./manage.py shell < run_load_games.py
                ./manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./:/code

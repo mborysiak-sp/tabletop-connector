@@ -31,8 +31,9 @@ class Chat(models.Model):
 
 class Game(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=512)
     image = models.CharField(max_length=512)
+    thumbnail = models.CharField(max_length=512)
     min_players = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
     max_players = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
     playtime = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)])
