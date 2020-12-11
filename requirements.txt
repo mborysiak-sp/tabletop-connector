@@ -48,3 +48,5 @@ pytest~=6.1.2
 # Big data
 numpy==1.19.1
 pandas~=1.1.5
+xmltodict~=0.12.0
+requests~=2.25.0
