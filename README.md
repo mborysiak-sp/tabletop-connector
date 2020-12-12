@@ -21,3 +21,7 @@ Run a command inside the docker container:
 ```bash
 docker-compose run --rm web [command]
 ```
+Run tests
+```bash
+docker-compose run web pytest --cov
+```
