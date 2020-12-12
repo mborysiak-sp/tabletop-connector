@@ -1,10 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.response import Response
 
 from .filters import FilterByDistance
 from .models import Address, Event
-from .serializers import AddressSerializer, EventSerializer
+from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer
 
 
 class AddressViewSet(viewsets.ViewSet):
@@ -52,13 +52,12 @@ class EventViewSet(viewsets.ViewSet):
     permission_classes = ()
 
     def list(self, request):
-
         serializer = self.serializer_class(Event.objects.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
 
-        serializer = self.serializer_class(data=request.data)
+        serializer = EventCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -66,6 +65,7 @@ class EventViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
+
         event = get_object_or_404(Event.objects.all(), pk=pk)
 
         return Response(self.serializer_class(event).data, status=status.HTTP_200_OK)
@@ -95,6 +95,8 @@ class CustomEventViewSet(ListAPIView):
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def get_queryset(self):
 
@@ -103,6 +105,7 @@ class CustomEventViewSet(ListAPIView):
         return queryset
 
     def get(self, *args, **kwargs):
+
 
         queryset = self.get_queryset()
         if queryset.count() == 0:
