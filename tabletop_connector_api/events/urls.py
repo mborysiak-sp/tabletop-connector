@@ -1,17 +1,20 @@
-from django.conf.urls import url
 from django.urls import path
 
 from rest_framework.routers import DefaultRouter
 
-from .views import EventViewSet, AddressViewSet, CustomEventViewSet
+from .views import EventViewSet, AddressViewSet, CustomEventAPIView, GameViewSet
 
 router = DefaultRouter()
+
+router.register(r'events', EventViewSet, 'event')
+router.register(r'addresses', AddressViewSet, 'address')
+router.register(r'games', GameViewSet, 'game')
 router.register(r'events', EventViewSet, basename='event')
 router.register(r'addresses', AddressViewSet, basename='address')
 
 app_name = 'events'
 urlpatterns = [
-    path('geteventbydistance/', CustomEventViewSet.as_view())
+    path('geteventbydistance/', CustomEventAPIView.as_view())
 ]
 
 urlpatterns += router.urls

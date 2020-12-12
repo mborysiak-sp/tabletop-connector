@@ -1,3 +1,13 @@
+
+from rest_framework import filters
+from rest_framework import viewsets, status
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+
+from .filters import FilterByDistance
+from .models import Address, Event, Game
+from .serializers import AddressSerializer, EventSerializer, GameSerializer
+
 from rest_framework import viewsets, status
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.response import Response
@@ -5,6 +15,7 @@ from rest_framework.response import Response
 from .filters import FilterByDistance
 from .models import Address, Event
 from .serializers import AddressSerializer, EventSerializer
+
 
 
 class AddressViewSet(viewsets.ViewSet):
@@ -89,7 +100,8 @@ class EventViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CustomEventViewSet(ListAPIView):
+
+class CustomEventAPIView(ListAPIView):
 
     authentication_classes = ()
     permission_classes = ()
@@ -111,9 +123,6 @@ class CustomEventViewSet(ListAPIView):
             serializer = self.serializer_class(queryset, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-
-
-
     # def create(self, request):
     #     serializer = EventSerializer(data=request.data)
     #     if serializer.is_valid():
@@ -121,27 +130,12 @@ class CustomEventViewSet(ListAPIView):
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def retrieve(self, request, pk=None):
-    #     queryset = Event.objects.all()
-    #     event = get_object_or_404(queryset, pk=pk)
-    #     serializer = EventSerializer(event)
-    #     return Response(serializer.data)
-    #
-    # def update(self, request, pk=None):
-    #     event = Event.objects.get(pk=pk)
-    #     serializer = EventSerializer(event, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #
-    # def partial_update(self, request, pk=None):
-    #     pass
-    #
-    # def destroy(self, request, pk=None):
-    #     event = Event.objects.get(pk=pk)
-    #     serializer = EventSerializer(event, data=request.data)
-    #     if serializer.is_valid():
-    #         event.delete()
-    #         return Response(serializer.data, status=status.HTTP_410_GONE)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GameViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    filter_backends = [filters.SearchFilter]
+    filter_class = Game
+    search_fields = ['name']
+    authentication_classes = ()
+    permission_classes = ()
