@@ -4,12 +4,13 @@ import pytest
 import pytz
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from tabletop_connector_api.events.models import Event
 from tabletop_connector_api.events.serializers import EventSerializer
-from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory
+from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory, UserFactory
 from tabletop_connector_api.events.views import CustomEventViewSet, EventViewSet
+from tabletop_connector_api.users.models import User
 
 
 @pytest.mark.django_db
@@ -56,12 +57,14 @@ class TestAddressViewSet(TestCase):
     def test_get_all_addresses(self):
         AddressFactory()
 
+
 @pytest.mark.django_db
 class TestEventViewSet(TestCase):
 
     def setUp(self):
 
         self.factory = APIRequestFactory()
+        self.user = UserFactory()
         self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update'})  # , 'get': 'retrieve'})
         self.example = {'name': 'test',
                         'date': '2020-12-14T20:09:00+0000',
@@ -81,34 +84,51 @@ class TestEventViewSet(TestCase):
 
         EventFactory()
         EventFactory(name='test2')
-        request = self.factory.patch('api/events/')
+        request = self.factory.get('api/events/')
+        force_authenticate(request, user=self.user)
         events = Event.objects.all()
         serializer = EventSerializer(events, many=True)
-        self.assertEqual(self.view(request).data, serializer.data)
+        self.assertEqual(self.view(request).data['results'], serializer.data)
 
     def test_get_all_events_status_code(self):
         EventFactory()
         EventFactory(name='test2')
-        request = self.factory.patch('api/events/')
+        request = self.factory.get('api/events/')
+        force_authenticate(request, user=self.user)
 
         self.assertEqual(self.view(request).status_code, 200)
 
+    def test_get_all_events_unauthenticated_status_code(self):
+        request = self.factory.get('api/events/')
+
+        self.assertEqual(self.view(request).status_code, 401)
+
     def test_create_valid_event_status_code(self):
         request = self.factory.post('api/events/', self.example, format='json')
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 201
 
-    def test_create_valid_event_is_in_object(self):
+    def test_create_valid_event_is_in_db(self):
 
         request = self.factory.post('api/events/', self.example, format='json')
+        force_authenticate(request, user=self.user)
         self.view(request)
+
         assert Event.objects.count() == 1
 
     def test_create_invalid_event(self):
         incorrect_example = self.example.copy()
         incorrect_example['name'] = '*'*100
         request = self.factory.post('api/events/', incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
         assert self.view(request).status_code == 400
+
+    def test_create_unauthenticated_status_code(self):
+        request = self.factory.post('api/events/', self.example, format='json')
+
+        assert self.view(request).status_code == 401
 
     # def test_get_existing_event(self):
     #     event = EventFactory()
