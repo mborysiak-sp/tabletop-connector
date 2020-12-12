@@ -8,9 +8,6 @@ newrelic==5.20.1.150
 psycopg2-binary==2.8.6
 dj-database-url==0.5.0
 
-# Development tools
-
-
 # Model Tools
 django-model-utils==4.0.0
 django_unique_upload==0.2.1
@@ -21,6 +18,7 @@ Markdown==3.3.2
 django-filter==2.4.0
 djoser==2.1.0
 djangorestframework_simplejwt==4.6.0
+
 # Developer Tools
 ipdb==0.13.4
 ipython==7.18.1
@@ -50,3 +48,7 @@ numpy==1.19.1
 pandas~=1.1.5
 xmltodict~=0.12.0
 requests~=2.25.0
+
+# Documentation
+drf-yasg~=1.20.0
+

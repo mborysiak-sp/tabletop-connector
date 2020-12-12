@@ -22,7 +22,9 @@ class Address(models.Model):
                + self.city.__str__() + " " \
                + self.street.__str__() + " " \
                + self.number.__str__() + " " \
-               + self.postal_code.__str__()
+               + self.postal_code.__str__() + " " \
+               + self.geo_x.__str__() + " " \
+               + self.geo_y.__str__()
 
 
 class Chat(models.Model):
@@ -46,4 +48,13 @@ class Event(models.Model):
     creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
     chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.SET_NULL)
+
     games = models.ManyToManyField(Game, related_name='games', related_query_name='games')
+
+    participants = models.ManyToManyField(User, default=creator, related_name='participants')
+
+    def __str__(self):
+        return self.name.__str__() + " "\
+               + self.date.__str__() + " "\
+               + self.address.__str__()
+
