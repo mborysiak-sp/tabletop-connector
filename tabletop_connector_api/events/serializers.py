@@ -55,7 +55,8 @@ class EventCreateSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('name', 'date', 'creator', 'address', )
+        fields = ('name', 'date', 'address',)
+    read_only_fields = ('creator', 'participants')
 
 
 class EventSerializer(serializers.ModelSerializer):

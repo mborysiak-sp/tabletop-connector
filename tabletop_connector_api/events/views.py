@@ -21,8 +21,6 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
-    authentication_classes = ()
-    permission_classes = ()
     queryset = Event.objects.all()
 
     def get_serializer_class(self):
@@ -30,6 +28,8 @@ class EventViewSet(viewsets.ModelViewSet):
            return EventCreateSerializer
         return super().get_serializer_class()
 
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user, participants=[self.request.user, ])
 
     # def list(self, request):
     #     serializer_class = self.serializer_class(Event.objects.all(), many=True)
