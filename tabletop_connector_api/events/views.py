@@ -16,7 +16,7 @@ class AddressViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update', 'create'):
-           return AddressCreateSerializer
+            return AddressCreateSerializer
         return super().get_serializer_class()
 
 
@@ -28,7 +28,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update', 'create'):
-           return EventCreateSerializer
+            return EventCreateSerializer
         return super().get_serializer_class()
 
     def perform_create(self, serializer):

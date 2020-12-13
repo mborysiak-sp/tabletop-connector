@@ -39,7 +39,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data = read_address(validated_data)
-
+        
         instance.country = validated_data.get('country', instance.country)
         instance.city = validated_data.get('city', instance.city)
         instance.street = validated_data.get('street', instance.street)
@@ -57,7 +57,6 @@ class AddressCreateSerializer(serializers.ModelSerializer):
         model = Address
         fields = ('country', 'city', 'street', 'postal_code', 'number', 'geo_x', 'geo_y')
 
-
     def create(self, validated_data):
         validated_data = read_address(validated_data)
         return Address.objects.create(**validated_data)
@@ -69,6 +68,7 @@ class EventCreateSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Event
         fields = ('name', 'date', 'address',)
+
     read_only_fields = ('creator', 'participants')
 
 

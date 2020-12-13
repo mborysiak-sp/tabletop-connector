@@ -30,7 +30,7 @@ class EventFactory(DjangoModelFactory):
     creator = None
     address = SubFactory(AddressFactory)
     chat = None
-    participants = None
+
 
 
 class UserFactory(DjangoModelFactory):

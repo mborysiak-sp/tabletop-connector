@@ -1,15 +1,11 @@
-from datetime import datetime
-
 import pytest
-import pytz
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIRequestFactory
-
+from rest_framework.test import APIRequestFactory, force_authenticate
 from tabletop_connector_api.events.models import Event
-from tabletop_connector_api.events.serializers import EventSerializer
-from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory
-from tabletop_connector_api.events.views import CustomEventViewSet, EventViewSet
+from tabletop_connector_api.events.serializers import EventSerializer, AddressSerializer, AddressCreateSerializer
+from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory, UserFactory
+from tabletop_connector_api.events.views import CustomEventViewSet, EventViewSet, AddressViewSet
 
 
 @pytest.mark.django_db
@@ -18,6 +14,9 @@ class TestCustomEventViewSet(TestCase):
     def setUp(self):
         self.view = CustomEventViewSet.as_view()
         self.factory = APIRequestFactory()
+
+    def test_CustomEventViewSet_serializer_class(self):
+        self.assertEqual(CustomEventViewSet.serializer_class, EventSerializer)
 
     def test_CustomEventViewSet_found_response_code(self):
         EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -50,19 +49,33 @@ class TestCustomEventViewSet(TestCase):
 class TestAddressViewSet(TestCase):
 
     def setUp(self):
-
         self.factory = APIRequestFactory()
 
-    def test_get_all_addresses(self):
-        AddressFactory()
+    def test_get_serializer_class(self):
+        request = self.factory.get(reverse('events:address-list'))
+        v = AddressViewSet()
+        v.action = 'list'
+
+        assert v.get_serializer_class() == AddressSerializer
+
+    def test_get_serializer_class_when_any_changes(self):
+        v = AddressViewSet()
+        v.action = 'update'
+
+        assert v.get_serializer_class() == AddressCreateSerializer
+
 
 @pytest.mark.django_db
 class TestEventViewSet(TestCase):
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def reset(self):
+        self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'})
 
+    def setUp(self):
         self.factory = APIRequestFactory()
-        self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update'})  # , 'get': 'retrieve'})
+        self.user = UserFactory()
+        # self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update'})  # , 'get': 'retrieve'})
         self.example = {'name': 'test',
                         'date': '2020-12-14T20:09:00+0000',
                         'creator': None,
@@ -78,79 +91,151 @@ class TestEventViewSet(TestCase):
                         }
 
     def test_get_all_events(self):
-
         EventFactory()
         EventFactory(name='test2')
-        request = self.factory.patch('api/events/')
+        request = self.factory.get('api/events/')
+        force_authenticate(request, user=self.user)
         events = Event.objects.all()
         serializer = EventSerializer(events, many=True)
-        self.assertEqual(self.view(request).data, serializer.data)
+        self.assertEqual(self.view(request).data['results'], serializer.data)
 
     def test_get_all_events_status_code(self):
         EventFactory()
         EventFactory(name='test2')
-        request = self.factory.patch('api/events/')
+        request = self.factory.get(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
 
         self.assertEqual(self.view(request).status_code, 200)
 
+    def test_get_all_events_unauthenticated_status_code(self):
+        request = self.factory.get(reverse('events:event-list'))
+
+        self.assertEqual(self.view(request).status_code, 401)
+
     def test_create_valid_event_status_code(self):
-        request = self.factory.post('api/events/', self.example, format='json')
+        request = self.factory.post(reverse('events:event-list'), self.example, format='json')
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 201
 
-    def test_create_valid_event_is_in_object(self):
-
-        request = self.factory.post('api/events/', self.example, format='json')
+    def test_create_valid_event_is_in_db(self):
+        request = self.factory.post(reverse('events:event-list'), self.example, format='json')
+        force_authenticate(request, user=self.user)
         self.view(request)
+
         assert Event.objects.count() == 1
+
+    def test_create_valid_event_creator_is_participant(self):
+        example_with_creator = self.example.copy()
+        example_with_creator['creator'] = self.user.pk
+        request = self.factory.post(reverse('events:event-list'), self.example, format='json')
+        force_authenticate(request, user=self.user)
+        self.view(request)
+
+        assert self.user in Event.objects.get(creator=self.user.pk).participants.all()
 
     def test_create_invalid_event(self):
         incorrect_example = self.example.copy()
         incorrect_example['name'] = '*'*100
-        request = self.factory.post('api/events/', incorrect_example, format='json')
+        request = self.factory.post(reverse('events:event-list'), incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
         assert self.view(request).status_code == 400
 
-    # def test_get_existing_event(self):
-    #     event = EventFactory()
-    #     url = f'api//events/{event.pk}/'
-    #     request = self.factory.get(url)
-    #     assert self.view(request).status_code == 200
-    #
-    # def test_get_non_existing_event(self):
-    #     request = self.factory.get('api//events/test/')
-    #     assert self.view(request).status_code == 404
-    #
-    # def test_update_event_with_valid_values(self):
-    #     event = EventFactory()
-    #     request = self.factory.put(f'api//events/{event.pk}/', self.example, format='json')
-    #
-    #     assert self.view(request).status_code == 200
-    #
-    # def test_update_event_with_invalid_value(self):
-    #     event = EventFactory()
-    #     incorrect_example = self.example.copy()
-    #     incorrect_example['name'] = '*' * 100
-    #     request = self.factory.put(f'api//events/{event.pk}/', incorrect_example, format='json')
-    #
-    #     assert self.view(request).status_code == 400
-    #
-    # def test_update_event_with_non_existing_address(self):
-    #     event = EventFactory()
-    #     incorrect_example = self.example.copy()
-    #     incorrect_example['address']['country'] = ''
-    #     incorrect_example['address']['city'] = ''
-    #     incorrect_example['address']['street'] = ''
-    #     incorrect_example['address']['number'] = ''
-    #     request = self.factory.put(f'api//events/{event.pk}/', incorrect_example, format='json')
-    #
-    #     assert self.view(request).status_code == 400
-    #
-    # def test_update_event_with_valid_values_check_are_values_changed(self):
-    #     event = EventFactory()
-    #     request = self.factory.put(f'api//events/{event.pk}/', self.example, format='json')
-    #     print(event)
-    #     self.view(request)
-    #     changed_event = Event.objects.get(pk=event.pk)
-    #     print(changed_event)
-    #     assert changed_event.name == self.example['name']
-    #     assert changed_event.address.street == self.example['address']['street']
+    def test_create_unauthenticated_status_code(self):
+        request = self.factory.post(reverse('events:event-list'), self.example, format='json')
+
+        assert self.view(request).status_code == 401
+
+    def test_get_existing_event(self):
+        event = EventFactory()
+        self.view = EventViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_get_not_existing_event(self):
+        self.view = EventViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk='xD').status_code == 404
+
+    def test_get_event_unauthenticated(self):
+        event = EventFactory()
+        self.view = EventViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get(reverse('events:event-list'))
+
+        assert self.view(request, pk=event.pk).status_code == 401
+
+    def test_update_event_with_valid_values(self):
+        event = EventFactory()
+        request = self.factory.put(reverse('events:event-list'), self.example, format='json')
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_update_event_with_invalid_value(self):
+        event = EventFactory()
+        incorrect_example = self.example.copy()
+        incorrect_example['name'] = '*' * 100
+        request = self.factory.put('api/events/', incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 400
+
+    def test_update_event_with_not_existing_address(self):
+        event = EventFactory()
+        incorrect_example = self.example.copy()
+        incorrect_example['address']['country'] = ''
+        incorrect_example['address']['city'] = ''
+        incorrect_example['address']['street'] = ''
+        incorrect_example['address']['number'] = ''
+        request = self.factory.put(reverse('events:event-list'), incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 400
+
+    def test_update_event_with_valid_values_check_are_values_changed(self):
+        event = EventFactory()
+        request = self.factory.put(reverse('events:event-list'), self.example, format='json')
+        force_authenticate(request, user=self.user)
+        self.view(request, pk=event.pk)
+        changed_event = Event.objects.get(pk=event.pk)
+
+        assert changed_event.name == self.example['name']
+        assert changed_event.address.street == self.example['address']['street']
+
+    def test_update_event_unauthenticated(self):
+        event = EventFactory()
+        request = self.factory.put(reverse('events:event-list'), self.example, format='json')
+
+        assert self.view(request, pk=event.pk).status_code == 401
+
+    def test_destroy_existing_event_code(self):
+        event = EventFactory()
+        request = self.factory.delete(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 204
+
+    def test_destroy_existing_event_is_not_in_db(self):
+        event = EventFactory()
+        request = self.factory.delete(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
+        self.view(request, pk=event.pk)
+
+        self.assertEqual(Event.objects.count(), 0)
+
+    def test_destroy_not_existing_event_code(self):
+        request = self.factory.delete(reverse('events:event-list'))
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk='xD').status_code == 404
+
+    def test_destroy_unauthenticated(self):
+        event = EventFactory()
+        request = self.factory.delete(reverse('events:event-list'))
+
+        assert self.view(request, pk=event.pk).status_code == 401
