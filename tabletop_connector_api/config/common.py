@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # token authentication
     'django_filters',            # for filtering rest endpoints
     'djoser',
+    'drf_yasg',
     # Project apps
     'tabletop_connector_api.users',
     'tabletop_connector_api.events',
