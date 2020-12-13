@@ -1,16 +1,11 @@
-from datetime import datetime
-
 import pytest
-import pytz
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIRequestFactory, force_authenticate
-
 from tabletop_connector_api.events.models import Event
 from tabletop_connector_api.events.serializers import EventSerializer
 from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory, UserFactory
 from tabletop_connector_api.events.views import CustomEventViewSet, EventViewSet
-from tabletop_connector_api.users.models import User
 
 
 @pytest.mark.django_db
@@ -19,6 +14,9 @@ class TestCustomEventViewSet(TestCase):
     def setUp(self):
         self.view = CustomEventViewSet.as_view()
         self.factory = APIRequestFactory()
+
+    def test_CustomEventViewSet_serializer_class(self):
+        self.assertEqual(CustomEventViewSet.serializer_class, EventSerializer)
 
     def test_CustomEventViewSet_found_response_code(self):
         EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -60,6 +58,10 @@ class TestAddressViewSet(TestCase):
 
 @pytest.mark.django_db
 class TestEventViewSet(TestCase):
+
+    @pytest.fixture(autouse=True)
+    def reset(self):
+        self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update'})
 
     def setUp(self):
 
@@ -111,7 +113,7 @@ class TestEventViewSet(TestCase):
 
     def test_create_valid_event_is_in_db(self):
 
-        request = self.factory.post('api/events/', self.example, format='json')
+        request = self.factory.post(reverse('events:event-<b>list</b>'), self.example, format='json')
         force_authenticate(request, user=self.user)
         self.view(request)
 
@@ -130,47 +132,53 @@ class TestEventViewSet(TestCase):
 
         assert self.view(request).status_code == 401
 
-    # def test_get_existing_event(self):
-    #     event = EventFactory()
-    #     url = f'api//events/{event.pk}/'
-    #     request = self.factory.get(url)
-    #     assert self.view(request).status_code == 200
-    #
-    # def test_get_non_existing_event(self):
-    #     request = self.factory.get('api//events/test/')
-    #     assert self.view(request).status_code == 404
-    #
-    # def test_update_event_with_valid_values(self):
-    #     event = EventFactory()
-    #     request = self.factory.put(f'api//events/{event.pk}/', self.example, format='json')
-    #
-    #     assert self.view(request).status_code == 200
-    #
-    # def test_update_event_with_invalid_value(self):
-    #     event = EventFactory()
-    #     incorrect_example = self.example.copy()
-    #     incorrect_example['name'] = '*' * 100
-    #     request = self.factory.put(f'api//events/{event.pk}/', incorrect_example, format='json')
-    #
-    #     assert self.view(request).status_code == 400
-    #
-    # def test_update_event_with_non_existing_address(self):
-    #     event = EventFactory()
-    #     incorrect_example = self.example.copy()
-    #     incorrect_example['address']['country'] = ''
-    #     incorrect_example['address']['city'] = ''
-    #     incorrect_example['address']['street'] = ''
-    #     incorrect_example['address']['number'] = ''
-    #     request = self.factory.put(f'api//events/{event.pk}/', incorrect_example, format='json')
-    #
-    #     assert self.view(request).status_code == 400
-    #
-    # def test_update_event_with_valid_values_check_are_values_changed(self):
-    #     event = EventFactory()
-    #     request = self.factory.put(f'api//events/{event.pk}/', self.example, format='json')
-    #     print(event)
-    #     self.view(request)
-    #     changed_event = Event.objects.get(pk=event.pk)
-    #     print(changed_event)
-    #     assert changed_event.name == self.example['name']
-    #     assert changed_event.address.street == self.example['address']['street']
+    def test_get_existing_event(self):
+
+        event = EventFactory()
+        self.view = EventViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get('api/events/')
+        force_authenticate(request, user=self.user)
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_get_non_existing_event(self):
+        self.view = EventViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get('api/events/')
+        force_authenticate(request, user=self.user)
+        assert self.view(request, pk="xD").status_code == 404
+
+    def test_update_event_with_valid_values(self):
+        event = EventFactory()
+        request = self.factory.put('api/events/', self.example, format='json')
+        force_authenticate(request, user=self.user)
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_update_event_with_invalid_value(self):
+        event = EventFactory()
+        incorrect_example = self.example.copy()
+        incorrect_example['name'] = '*' * 100
+        request = self.factory.put('api/events/', incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 400
+
+    def test_update_event_with_non_existing_address(self):
+        event = EventFactory()
+        incorrect_example = self.example.copy()
+        incorrect_example['address']['country'] = ''
+        incorrect_example['address']['city'] = ''
+        incorrect_example['address']['street'] = ''
+        incorrect_example['address']['number'] = ''
+        request = self.factory.put('api/events/', incorrect_example, format='json')
+        force_authenticate(request, user=self.user)
+
+        assert self.view(request, pk=event.pk).status_code == 400
+
+    def test_update_event_with_valid_values_check_are_values_changed(self):
+        event = EventFactory()
+        request = self.factory.put('api/events/', self.example, format='json')
+        force_authenticate(request, user=self.user)
+        self.view(request, pk=event.pk)
+        changed_event = Event.objects.get(pk=event.pk)
+
+        assert changed_event.name == self.example['name']
+        assert changed_event.address.street == self.example['address']['street']
