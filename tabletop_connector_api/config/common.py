@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     # Project apps
     'tabletop_connector_api.users',
     'tabletop_connector_api.events',
+    'tabletop_connector_api.chats',
 ]
 
 # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
