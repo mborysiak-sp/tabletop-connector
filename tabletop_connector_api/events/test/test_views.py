@@ -51,7 +51,6 @@ class TestAddressViewSet(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
 
-
     def test_get_serializer_class(self):
         request = self.factory.get(reverse('events:address-list'))
         v = AddressViewSet()
@@ -59,13 +58,11 @@ class TestAddressViewSet(TestCase):
 
         assert v.get_serializer_class() == AddressSerializer
 
-
     def test_get_serializer_class_when_any_changes(self):
         v = AddressViewSet()
         v.action = 'update'
 
         assert v.get_serializer_class() == AddressCreateSerializer
-
 
 
 @pytest.mark.django_db

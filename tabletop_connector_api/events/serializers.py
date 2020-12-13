@@ -6,17 +6,14 @@ from .utils import address_to_geocode
 
 
 class AddressSerializer(serializers.ModelSerializer):
-
     geo_x = serializers.FloatField(required=False, allow_null=True)
     geo_y = serializers.FloatField(required=False, allow_null=True)
 
     class Meta:
         model = Address
-        fields = ('id', 'country', 'city', 'street', 'postal_code', 'number', 'geo_x', 'geo_y', )
-
+        fields = ('id', 'country', 'city', 'street', 'postal_code', 'number', 'geo_x', 'geo_y',)
 
     def update(self, instance, validated_data):
-
         geocode = address_to_geocode(validated_data)
         if geocode == ():
             return None
@@ -34,13 +31,11 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class AddressCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Address
-        fields = ('country', 'city', 'street', 'postal_code', 'number', )
+        fields = ('country', 'city', 'street', 'postal_code', 'number',)
 
     def create(self, validated_data):
-
         geocode = address_to_geocode(validated_data)
         if geocode == ():
             return None
@@ -50,17 +45,16 @@ class AddressCreateSerializer(serializers.ModelSerializer):
 
 
 class EventCreateSerializer(WritableNestedModelSerializer):
-
     address = AddressCreateSerializer(many=False)
 
     class Meta:
         model = Event
         fields = ('name', 'date', 'address',)
+
     read_only_fields = ('creator', 'participants')
 
 
 class EventSerializer(serializers.ModelSerializer):
-
     address = AddressSerializer(many=False)
 
     class Meta:
