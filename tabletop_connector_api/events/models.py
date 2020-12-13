@@ -48,13 +48,12 @@ class Event(models.Model):
     creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
     chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.SET_NULL)
-
+    participants = models.ManyToManyField(User, related_name='participants')
     games = models.ManyToManyField(Game, related_name='games', related_query_name='games')
 
-    participants = models.ManyToManyField(User, default=creator, related_name='participants')
 
     def __str__(self):
         return self.name.__str__() + " "\
                + self.date.__str__() + " "\
                + self.address.__str__()
-
+    

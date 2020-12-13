@@ -5,6 +5,7 @@ from factory import SubFactory
 from factory.django import DjangoModelFactory
 
 from tabletop_connector_api.events.models import Address, Event
+from tabletop_connector_api.users.models import User
 
 
 class AddressFactory(DjangoModelFactory):
@@ -29,3 +30,11 @@ class EventFactory(DjangoModelFactory):
     creator = None
     address = SubFactory(AddressFactory)
     chat = None
+    participants = None
+
+
+class UserFactory(DjangoModelFactory):
+    class Meta:
+        model = User
+
+

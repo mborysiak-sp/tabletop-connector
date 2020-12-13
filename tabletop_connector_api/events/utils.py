@@ -8,6 +8,28 @@ from geopy.geocoders import Nominatim
 from tabletop_connector_api.events.models import Game
 
 
+def geocode_to_address(geocode: tuple):
+    def parse_address(address_string :str):
+        # works only for poland and polish towns
+        address_list = address_string.split(', ')
+        address_dict = {
+            'number': address_list[0],
+            'street': address_list[1],
+            'city': address_list[3],
+            'postal_code': address_list[-2],
+            'country': address_list[-1]
+        }
+        return address_dict
+
+    try:
+        address = Nominatim(user_agent="xd").reverse(geocode)
+        return parse_address(address.address)
+    except AttributeError:
+        return ()
+    except TypeError:
+        return ()
+
+
 def address_to_geocode(address: dict):
     result = Nominatim(user_agent="xd").geocode(address.get("country", [""])[0] + " "
                                                 + address.get("city", [""])[0] + " "
