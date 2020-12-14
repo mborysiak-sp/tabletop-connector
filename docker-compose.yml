@@ -12,7 +12,6 @@ services:
     command: >
       bash -c "./manage.py makemigrations &&
                ./manage.py migrate &&
-               pytest  &&
                ./manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./:/code
@@ -20,13 +19,3 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-
-
-#  documentation:
-#    restart: always
-#    build: ./
-#    command: "mkdocs serve"
-#    volumes:
-#      - ./:/code
-#    ports:
-#      - "8001:8001"

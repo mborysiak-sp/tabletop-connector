@@ -1,81 +1,88 @@
-# Create your views here.
-
-from rest_framework import viewsets, generics, mixins, status
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, filters, generics
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.generics import ListAPIView
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 
 from .filters import FilterByDistance
-from .models import Address, Event
-from .serializers import AddressSerializer, EventSerializer
-from .utils import address_to_geocode, get_distance_in_kilometers
+from .models import Address, Event, Game
+from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer, AddressCreateSerializer, GameSerializer
 
 
 class AddressViewSet(viewsets.ModelViewSet):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    authentication_classes = ()
+    permission_classes = ()
+    queryset = Address.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ('update', 'partial_update', 'create'):
+            return AddressCreateSerializer
+        return super().get_serializer_class()
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.all()
     serializer_class = EventSerializer
+    queryset = Event.objects.all()
     authentication_classes = ()
     permission_classes = ()
 
+    def get_serializer_class(self):
+        if self.action in ('update', 'partial_update', 'create'):
+            return EventCreateSerializer
+        return super().get_serializer_class()
 
-class CustomEventViewSet(ListAPIView):
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user, participants=[self.request.user, ])
+
+
+class CustomEventAPIView(ListAPIView):
+
     authentication_classes = ()
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def get_queryset(self):
 
         queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
-
         return queryset
 
+    @action(detail=True)
     def get(self, *args, **kwargs):
 
         queryset = self.get_queryset()
         if queryset.count() == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             serializer = self.serializer_class(queryset, many=True)
-            return Response(data=serializer.data, status=status.HTTP_302_FOUND)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    # def list(self, request):
-    # events = Event.objects.all()
-    # serializer = EventSerializer(events, many=True)
-    # return Response(serializer.data)
 
-    # def create(self, request):
-    #     serializer = EventSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class GameViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    filter_backends = [filters.SearchFilter]
+    filter_class = Game
+    search_fields = ['name']
+    authentication_classes = ()
+    permission_classes = ()
 
-    # def retrieve(self, request, pk=None):
-    #     queryset = Event.objects.all()
-    #     event = get_object_or_404(queryset, pk=pk)
-    #     serializer = EventSerializer(event)
-    #     return Response(serializer.data)
-    #
-    # def update(self, request, pk=None):
-    #     event = Event.objects.get(pk=pk)
-    #     serializer = EventSerializer(event, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #
-    # def partial_update(self, request, pk=None):
-    #     pass
-    #
-    # def destroy(self, request, pk=None):
-    #     event = Event.objects.get(pk=pk)
-    #     serializer = EventSerializer(event, data=request.data)
-    #     if serializer.is_valid():
-    #         event.delete()
-    #         return Response(serializer.data, status=status.HTTP_410_GONE)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PATCH'])
+@permission_classes(())
+@authentication_classes(())
+def join_leave_event(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+
+    if request.user in event.participants:
+        event.participants.remove(request.user)
+
+    else:
+        event.participants.add(request.user)
+
+    event.save()
+    return Response(status.HTTP_200_OK)
