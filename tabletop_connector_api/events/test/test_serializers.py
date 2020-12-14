@@ -28,11 +28,21 @@ class AddressCreateSerializerTest(TestCase):
 class AddressSerializerTest(TestCase):
     def setUp(self):
         self.address_serializer = AddressSerializer()
-        self.valid_address = {'country': 'Poland', 'city': 'Gdansk',
-                              'street': 'Wita Stwosza', 'postal_code': 'aa', 'number': '22'}
+        self.valid_address = {'country': 'Poland',
+                              'city': 'Gdansk',
+                              'street': 'Wita Stwosza',
+                              'postal_code': 'aa',
+                              'number': '22',
+                              'geo_x': None,
+                              'geo_y': None}
 
-        self.invalid_address = {'country': '', 'city': '',
-                                'street': 'a' * 40, 'postal_code': '', 'number': ''}
+        self.invalid_address = {'country': '',
+                                'city': '',
+                                'street': 'a' * 40,
+                                'postal_code': '',
+                                'number': '',
+                                'geo_x': None,
+                                'geo_y': None}
 
     def test_update_valid_data(self):
         address = AddressFactory()
