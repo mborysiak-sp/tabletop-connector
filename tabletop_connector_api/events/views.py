@@ -1,6 +1,8 @@
-
-from rest_framework import viewsets, status, filters
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, filters, generics
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.generics import ListAPIView
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 
 from .filters import FilterByDistance
@@ -49,6 +51,7 @@ class CustomEventAPIView(ListAPIView):
         queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
         return queryset
 
+    @action(detail=True)
     def get(self, *args, **kwargs):
 
         queryset = self.get_queryset()
@@ -67,3 +70,19 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['name']
     authentication_classes = ()
     permission_classes = ()
+
+
+@api_view(['PATCH'])
+@permission_classes(())
+@authentication_classes(())
+def join_leave_event(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+
+    if request.user in event.participants:
+        event.participants.remove(request.user)
+
+    else:
+        event.participants.add(request.user)
+
+    event.save()
+    return Response(status.HTTP_200_OK)

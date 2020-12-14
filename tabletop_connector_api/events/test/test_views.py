@@ -5,18 +5,18 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from tabletop_connector_api.events.models import Event
 from tabletop_connector_api.events.serializers import EventSerializer, AddressSerializer, AddressCreateSerializer
 from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory, UserFactory
-from tabletop_connector_api.events.views import CustomEventViewSet, EventViewSet, AddressViewSet
+from tabletop_connector_api.events.views import CustomEventAPIView, EventViewSet, AddressViewSet
 
 
 @pytest.mark.django_db
 class TestCustomEventViewSet(TestCase):
 
     def setUp(self):
-        self.view = CustomEventViewSet.as_view()
+        self.view = CustomEventAPIView.as_view()
         self.factory = APIRequestFactory()
 
     def test_CustomEventViewSet_serializer_class(self):
-        self.assertEqual(CustomEventViewSet.serializer_class, EventSerializer)
+        self.assertEqual(CustomEventAPIView.serializer_class, EventSerializer)
 
     def test_CustomEventViewSet_found_response_code(self):
         EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -239,3 +239,9 @@ class TestEventViewSet(TestCase):
         request = self.factory.delete(reverse('events:event-list'))
 
         assert self.view(request, pk=event.pk).status_code == 401
+
+@pytest.mark.django_db
+class TestJoinLeaveEvent(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = UserFactory()
