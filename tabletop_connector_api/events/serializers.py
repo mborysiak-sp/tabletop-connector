@@ -20,7 +20,12 @@ def read_address(validated_data):
         except TypeError:
             raise serializers.ValidationError("Address not found")
     else:
+
         geocode = address_to_geocode(validated_data)
+
+        if geocode == ():
+            raise serializers.ValidationError("Address not found")
+
         try:
             validated_data['geo_x'] = geocode[0]
             validated_data['geo_y'] = geocode[1]
