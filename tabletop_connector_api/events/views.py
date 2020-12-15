@@ -25,8 +25,6 @@ class AddressViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    authentication_classes = ()
-    permission_classes = ()
 
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update', 'create'):
@@ -34,6 +32,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     def perform_create(self, serializer):
+        user = self.request.user
         serializer.save(creator=self.request.user, participants=[self.request.user, ])
 
 
@@ -73,12 +72,12 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @api_view(['PATCH'])
-@permission_classes(())
-@authentication_classes(())
 def join_leave_event(request, pk):
     event = get_object_or_404(Event, pk=pk)
+
     if request.user == event.creator:
-        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+        print(request.user == event.creator)
+        return Response(None, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     if request.user in event.participants.all():
         event.participants.remove(request.user)
@@ -87,4 +86,4 @@ def join_leave_event(request, pk):
         event.participants.add(request.user)
 
     event.save()
-    return Response(status.HTTP_200_OK)
+    return Response(None, status.HTTP_200_OK)

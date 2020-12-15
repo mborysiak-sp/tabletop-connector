@@ -256,7 +256,7 @@ class TestEventViewSet(TestCase):
 class TestJoinLeaveEvent(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = UserFactory()
+        self.user = UserFactory(username='test')
         self.user_2 = UserFactory(username='xd')
         self.view = join_leave_event
 
@@ -293,6 +293,7 @@ class TestJoinLeaveEvent(TestCase):
         event = EventFactory(creator=self.user)
         request = self.factory.patch('api/participation/')
         force_authenticate(request, user=self.user)
+
         assert self.view(request, pk=event.pk).status_code == 405
 
     def test_if_no_event_found(self):
