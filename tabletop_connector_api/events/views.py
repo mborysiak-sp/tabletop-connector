@@ -77,8 +77,8 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
 @authentication_classes(())
 def join_leave_event(request, pk):
     event = get_object_or_404(Event, pk=pk)
-
-    if request.user in event.participants:
+    print(request.user)
+    if request.user in event.participants.all():
         event.participants.remove(request.user)
 
     else:

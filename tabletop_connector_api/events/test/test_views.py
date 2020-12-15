@@ -5,7 +5,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from tabletop_connector_api.events.models import Event
 from tabletop_connector_api.events.serializers import EventSerializer, AddressSerializer, AddressCreateSerializer
 from tabletop_connector_api.events.test.factories import EventFactory, AddressFactory, UserFactory
-from tabletop_connector_api.events.views import CustomEventAPIView, EventViewSet, AddressViewSet
+from tabletop_connector_api.events.views import CustomEventAPIView, EventViewSet, AddressViewSet, join_leave_event
 
 
 @pytest.mark.django_db
@@ -15,34 +15,43 @@ class TestCustomEventViewSet(TestCase):
         self.view = CustomEventAPIView.as_view()
         self.factory = APIRequestFactory()
 
-    def test_CustomEventViewSet_serializer_class(self):
+    def test_CustomEventAPIView_serializer_class(self):
         self.assertEqual(CustomEventAPIView.serializer_class, EventSerializer)
 
-    def test_CustomEventViewSet_found_response_code(self):
+    def test_CustomEventAPIView_found_response_code(self):
         EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 200
 
-    def test_CustomEventViewSet_found_in_queryset(self):
+    def test_CustomEventAPIView_found_in_queryset(self):
         EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert len(self.view(request).data) == 1
 
-    def test_CustomEventViewSet_not_found_response_code(self):
+    def test_CustomEventAPIView_not_found_response_code(self):
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 204
 
-    def test_CustomEventViewSet_when_address_no_specified(self):
+    def test_CustomEventAPIView_when_address_no_specified(self):
         request = self.factory \
             .get('api/geteventbydistance/?distance=10')
 
         assert self.view(request).status_code == 204
+
+    def test_CustomEventAPIView_search(self):
+        EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory.create(name='xyz', address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        request = self.factory \
+            .get('api/geteventbydistance/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna')
+
+        assert len(self.view(request).data) == 1
+
 
 
 @pytest.mark.django_db
@@ -84,7 +93,9 @@ class TestEventViewSet(TestCase):
                             'city': 'Gdansk',
                             'street': 'Wita Stwosza',
                             'postal_code': '21-307',
-                            'number': '2'
+                            'number': '2',
+                            'geo_x': None,
+                            'geo_y': None
                             },
                         'chat': None,
                         'participants': None
@@ -240,8 +251,51 @@ class TestEventViewSet(TestCase):
 
         assert self.view(request, pk=event.pk).status_code == 401
 
+
 @pytest.mark.django_db
 class TestJoinLeaveEvent(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = UserFactory()
+        self.user_2 = UserFactory(username='xd')
+        self.view = join_leave_event
+
+    def test_if_joined_not_creator(self):
+        event = EventFactory(creator=self.user)
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user_2)
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_if_joined_not_creator_in_participants(self):
+        event = EventFactory(creator=self.user)
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user_2)
+        self.view(request, pk=event.pk)
+
+        assert self.user_2 in event.participants.all()
+
+    def test_if_left_not_creator(self):
+        event = EventFactory(creator=self.user)
+        event.participants.add(self.user_2)
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user_2)
+        assert self.view(request, pk=event.pk).status_code == 200
+
+    def test_if_left_not_creator_not_in_participants(self):
+        event = EventFactory(creator=self.user)
+        event.participants.add(self.user_2)
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user_2)
+        self.view(request, pk=event.pk)
+        assert self.user_2 not in event.participants.all()
+
+    def test_if_owner(self):
+        event = EventFactory(creator=self.user)
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user)
+        assert self.view(request, pk=event.pk).status_code == 405
+
+    def test_if_no_event_found(self):
+        request = self.factory.patch('api/participation/')
+        force_authenticate(request, user=self.user)
+        assert self.view(request, pk='123e4567-e89b-12d3-a456-426614174000').status_code == 404
