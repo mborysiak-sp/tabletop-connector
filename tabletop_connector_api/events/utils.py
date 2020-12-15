@@ -1,26 +1,26 @@
 import math
 import os
 import pandas as pd
-from geopy.geocoders import Nominatim
+from geopy import Nominatim
 from tabletop_connector_api.events.models import Game
 
 
 def geocode_to_address(geocode: tuple):
-    def parse_address(address_string :str):
-        # works only for poland and polish towns
-        address_list = address_string.split(', ')
+    def parse_address(address_dict):
         address_dict = {
-            'number': address_list[0],
-            'street': address_list[1],
-            'city': address_list[3],
-            'postal_code': address_list[-2],
-            'country': address_list[-1]
+            'number': address_dict['house_number'],
+            'street': address_dict.get('road', address_dict.get('village')),
+            'city': address_dict.get('city', address_dict.get('municipality')),
+            'postal_code': address_dict['postcode'],
+            'country': address_dict['country']
         }
         return address_dict
 
     try:
-        address = Nominatim(user_agent="xd").reverse(geocode)
-        return parse_address(address.address)
+        address = Nominatim(user_agent='temp').reverse(geocode)
+        address_components = address.raw['address']
+        parsed_address = parse_address(address_components)
+        return parsed_address
     except AttributeError:
         return ()
     except TypeError:
@@ -29,11 +29,11 @@ def geocode_to_address(geocode: tuple):
 
 def address_to_geocode(address: dict):
     try:
-        result = Nominatim(user_agent="xd").geocode(address.get("country", [""])[0] + " "
-                                                    + address.get("city", [""])[0] + " "
-                                                    # + address.get("postal_code", "") + " "
-                                                    + address.get("street", [""])[0] + " "
-                                                    + address.get("number", [""])[0])
+        result = Nominatim(user_agent='tempa').geocode(address.get("country", [""])[0] + " "
+                                                      + address.get("city", [""])[0] + " "
+                                                      # + address.get("postal_code", "")[0] + " "
+                                                      + address.get("street", [""])[0] + " "
+                                                      + address.get("number", [""])[0])
         try:
             return result.latitude, result.longitude
         except AttributeError:
