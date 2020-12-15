@@ -42,18 +42,18 @@ class CustomEventAPIView(ListAPIView):
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    filter_backends = [filters.SearchFilter, FilterByDistance, filters.OrderingFilter]
+    search_fields = ['name', ]
 
     def get_queryset(self):
 
-        queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
+        queryset = Event.objects.all()
         return queryset
 
     @action(detail=True)
     def get(self, *args, **kwargs):
 
-        queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
         if queryset.count() == 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:

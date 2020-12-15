@@ -17,8 +17,8 @@ class AddressFactory(DjangoModelFactory):
     street = 'Podwale Grodzkie',
     number = 2,
     postal_code = '80-895'
-    geo_x = 0.0
-    geo_y = 0.0
+    geo_x = None
+    geo_y = None
 
 
 class EventFactory(DjangoModelFactory):
