@@ -38,7 +38,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
-        assert len(self.view(request).data) == 1
+        assert self.view(request).data.get('count') == 1
 
     def test_CustomEventAPIView_not_found_response_code(self):
         EventFactory(address=AddressFactory(city='Wroclaw',
@@ -70,7 +70,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory \
             .get('api/geteventbydistance/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
-        assert len(self.view(request).data) == 1
+        assert self.view(request).data.get('count') == 1
 
 
 @pytest.mark.django_db
