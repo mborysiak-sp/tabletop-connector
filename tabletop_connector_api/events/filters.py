@@ -23,3 +23,11 @@ class FilterByDistance(filters.BaseFilterBackend):
                                                                               geocode_from[1]) < distance]
         queryset = queryset.filter(id__in=nearly_events)
         return queryset
+
+
+class FilterByDate(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        pass
+
+
