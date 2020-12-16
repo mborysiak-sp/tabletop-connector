@@ -3,11 +3,13 @@ from rest_framework import viewsets, status, filters, generics
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.generics import ListAPIView
 from rest_framework.mixins import UpdateModelMixin
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .filters import FilterByDistance
 from .models import Address, Event, Game
-from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer, AddressCreateSerializer, GameSerializer
+from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer, AddressCreateSerializer, \
+    GameSerializer
 
 
 class AddressViewSet(viewsets.ModelViewSet):
@@ -37,28 +39,34 @@ class EventViewSet(viewsets.ModelViewSet):
 
 
 class CustomEventAPIView(ListAPIView):
-
     authentication_classes = ()
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    filter_backends = [filters.SearchFilter, FilterByDistance, filters.OrderingFilter]
+    search_fields = ['name', ]  # describe here which fields want to use for searching, then we use search=*
+    ordering_fields = ['date', ]  # describe here which fields want to use for ordering, then we use order=(-)field
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
 
-        queryset = FilterByDistance().filter_queryset(self.request, self.queryset, self.__class__)
+        queryset = Event.objects.all()
         return queryset
 
     @action(detail=True)
-    def get(self, *args, **kwargs):
+    def list(self, *args, **kwargs):
 
-        queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
         if queryset.count() == 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             serializer = self.serializer_class(queryset, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            page = self.paginate_queryset(queryset=serializer.data)
+
+            return self.get_paginated_response(page)
+
+            # return Response(data=self.get_paginated_response(page).data,
+            #                 status=status.HTTP_200_OK)
 
 
 class GameViewSet(viewsets.ReadOnlyModelViewSet):

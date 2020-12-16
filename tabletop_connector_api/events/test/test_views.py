@@ -19,39 +19,58 @@ class TestCustomEventViewSet(TestCase):
         self.assertEqual(CustomEventAPIView.serializer_class, EventSerializer)
 
     def test_CustomEventAPIView_found_response_code(self):
-        EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 200
 
     def test_CustomEventAPIView_found_in_queryset(self):
-        EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
-        assert len(self.view(request).data) == 1
+        assert self.view(request).data.get('count') == 1
 
     def test_CustomEventAPIView_not_found_response_code(self):
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 204
 
     def test_CustomEventAPIView_when_address_no_specified(self):
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9'))
         request = self.factory \
             .get('api/geteventbydistance/?distance=10')
 
         assert self.view(request).status_code == 204
 
     def test_CustomEventAPIView_search(self):
-        EventFactory.create(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        EventFactory.create(name='xyz', address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+
+        EventFactory(name='xyz',
+                     address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
         request = self.factory \
             .get('api/geteventbydistance/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
-        assert len(self.view(request).data) == 1
-
+        assert self.view(request).data.get('count') == 1
 
 
 @pytest.mark.django_db
