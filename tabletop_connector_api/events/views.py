@@ -46,7 +46,6 @@ class CustomEventAPIView(ListAPIView):
     filter_backends = [filters.SearchFilter, FilterByDistance, filters.OrderingFilter]
     search_fields = ['name', ]  # describe here which fields want to use for searching, then we use search=*
     ordering_fields = ['date', ]  # describe here which fields want to use for ordering, then we use order=(-)field
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
 
@@ -64,9 +63,6 @@ class CustomEventAPIView(ListAPIView):
             page = self.paginate_queryset(queryset=serializer.data)
 
             return self.get_paginated_response(page)
-
-            # return Response(data=self.get_paginated_response(page).data,
-            #                 status=status.HTTP_200_OK)
 
 
 class GameViewSet(viewsets.ReadOnlyModelViewSet):
