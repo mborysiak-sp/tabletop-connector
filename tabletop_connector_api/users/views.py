@@ -2,7 +2,7 @@ from djoser.serializers import UserSerializer
 from rest_framework import viewsets, mixins, views
 
 from .models import User, Profile
-from .permissions import IsUserOrReadOnly
+from .permissions import IsUserOrReadOnly, IsOwnerOrReadOnly
 from .serializers import ProfileSerializer
 
 
@@ -15,4 +15,4 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
     """
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
