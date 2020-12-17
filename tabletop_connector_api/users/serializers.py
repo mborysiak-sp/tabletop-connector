@@ -4,12 +4,19 @@ from .models import User, Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'firstname', 'lastname',)
-        read_only_fields = ('user',)
+        fields = ('firstname', 'lastname',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'profile')
+        read_only_fields = ('profile',)
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

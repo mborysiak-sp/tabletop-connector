@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
-
+from ..users.serializers import ProfileSerializer, UserSerializer
 
 
 def read_address(validated_data):
@@ -79,6 +79,8 @@ class EventCreateSerializer(WritableNestedModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     address = AddressSerializer(many=False)
+    participants = UserSerializer(many=True)
+    creator = UserSerializer(many=False)
 
     class Meta:
         model = Event
