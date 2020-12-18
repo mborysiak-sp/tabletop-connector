@@ -26,7 +26,7 @@ class EventFactory(DjangoModelFactory):
         model = Event
 
     name = "test"
-    date = datetime.now(tz=pytz.UTC)
+    date = datetime(2025, 12, 25, 11, 0, tzinfo=pytz.UTC)
     creator = None
     address = SubFactory(AddressFactory)
     chat = None
