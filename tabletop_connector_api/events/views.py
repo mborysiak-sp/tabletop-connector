@@ -6,7 +6,7 @@ from rest_framework.mixins import UpdateModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from .filters import FilterByDistance
+from .filters import FilterByDistance, FilterByDate
 from .models import Address, Event, Game
 from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer, AddressCreateSerializer, \
     GameSerializer
@@ -43,7 +43,7 @@ class CustomEventAPIView(ListAPIView):
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
-    filter_backends = [filters.SearchFilter, FilterByDistance, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, FilterByDate, FilterByDistance, filters.OrderingFilter]
     search_fields = ['name', ]  # describe here which fields want to use for searching, then we use search=*
     ordering_fields = ['date', ]  # describe here which fields want to use for ordering, then we use order=(-)field
 
