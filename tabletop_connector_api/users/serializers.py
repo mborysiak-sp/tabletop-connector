@@ -1,29 +1,32 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 
-from .models import User, Profile, Avatar
-
-
-class AvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Avatar
-        fields = ('file', )
+from .models import User, Profile
 
 
-class ProfileSerializer(WritableNestedModelSerializer):
-    avatar = AvatarSerializer(many=False)
+class ProfileSerializer(serializers.ModelSerializer):
+    image = SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ('id', 'firstname', 'lastname', 'avatar')
+        fields = ('id', 'firstname', 'lastname', 'image')
 
-    def get_avatar(self, profile):
+    def get_image(self, profile):
         request = self.context.get('request')
-        if profile and hasattr(profile, 'url'):
-            avatar = profile.avatar.url
-            return request.build_absolute_uri(avatar)
+        if profile and hasattr(profile, 'image'):
+            image = profile.image.url
+            return request.build_absolute_uri(image)
         else:
             return None
+
+
+class CreateProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = ('firstname', 'lastname', 'avatar')
+
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()

@@ -17,9 +17,5 @@ class Profile(models.Model):
     firstname = models.TextField(blank=True, null=True, max_length=64)
     lastname = models.CharField(blank=True, null=True, max_length=64)
     date_joined = models.DateTimeField(auto_now_add=True)
-
-
-class Avatar(models.Model):
-    file = models.ImageField(upload_to='avatars/')
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/')
 
