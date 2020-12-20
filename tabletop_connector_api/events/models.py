@@ -49,7 +49,7 @@ class Event(models.Model):
     address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
     chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.SET_NULL)
     participants = models.ManyToManyField(User, related_name='participants')
-    games = models.ManyToManyField(Game, related_name='games', related_query_name='games', null=True, blank=True)
+    games = models.ManyToManyField(Game, related_name='games', related_query_name='games', blank=True)
 
     def __str__(self):
         return self.name.__str__() + " "\
