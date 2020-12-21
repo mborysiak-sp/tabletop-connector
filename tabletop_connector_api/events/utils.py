@@ -1,7 +1,7 @@
 import math
 import os
 import pandas as pd
-from geopy import Nominatim
+from geopy import Here
 from tabletop_connector_api.events.models import Game
 
 
@@ -17,7 +17,7 @@ def geocode_to_address(geocode: tuple):
         return address_dict
 
     try:
-        address = Nominatim(user_agent='temp').reverse(geocode)
+        address = Here(apikey=os.getenv('HERE_APIKEY')).reverse(geocode)
         address_components = address.raw['address']
         parsed_address = parse_address(address_components)
         return parsed_address
@@ -29,11 +29,13 @@ def geocode_to_address(geocode: tuple):
 
 def address_to_geocode(address: dict):
     try:
-        result = Nominatim(user_agent='tempa').geocode(address.get("country", [""])[0] + " "
-                                                      + address.get("city", [""])[0] + " "
-                                                      # + address.get("postal_code", "")[0] + " "
-                                                      + address.get("street", [""])[0] + " "
-                                                      + address.get("number", [""])[0])
+        result = Here(apikey=os.getenv('HERE_APIKEY')).geocode(
+            address.get("country", [""])[0] + " "
+            + address.get("city", [""])[0] + " "
+            + address.get("postal_code", "")[0] + " "
+            + address.get("street", [""])[0] + " "
+            + address.get("number", [""])[0]
+        )
         try:
             return result.latitude, result.longitude
         except AttributeError:

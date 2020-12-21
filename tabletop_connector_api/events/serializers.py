@@ -5,7 +5,6 @@ from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
 
 
-
 def read_address(validated_data):
     if validated_data.get('geo_x') is not None and validated_data.get('geo_y') is not None:
         address = geocode_to_address((
