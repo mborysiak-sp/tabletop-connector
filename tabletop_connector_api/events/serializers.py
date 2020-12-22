@@ -5,9 +5,8 @@ from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
 from ..users.serializers import ProfileSerializer, UserSerializer
 
-
 def read_address(validated_data):
-    if validated_data['geo_x'] and validated_data['geo_y']:
+    if validated_data.get('geo_x') is not None and validated_data.get('geo_y') is not None:
         address = geocode_to_address((
             validated_data['geo_x'],
             validated_data['geo_y']
@@ -20,12 +19,9 @@ def read_address(validated_data):
         except TypeError:
             raise serializers.ValidationError("Address not found")
     else:
-
         geocode = address_to_geocode(validated_data)
-
         if geocode == ():
             raise serializers.ValidationError("Address not found")
-
         try:
             validated_data['geo_x'] = geocode[0]
             validated_data['geo_y'] = geocode[1]
