@@ -3,7 +3,8 @@ from rest_framework import serializers
 
 from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
-from ..users.serializers import ProfileSerializer, UserSerializer
+from ..users.serializers import UserSerializer
+
 
 def read_address(validated_data):
     if validated_data.get('geo_x') is not None and validated_data.get('geo_y') is not None:
@@ -72,14 +73,14 @@ class GameSerializer(serializers.ModelSerializer):
 
 class EventCreateSerializer(WritableNestedModelSerializer):
     address = AddressCreateSerializer(many=False)
-    #participants = UserSerializer(many=True, read_only=True)
-    #creator = UserSerializer(many=False, read_only=True)
-    #games = GameSerializer(many=True, read_only=True)
+    participants = UserSerializer(many=True, read_only=True)
+    creator = UserSerializer(many=False, read_only=True)
+    games = GameSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
         read_only_fields = ('id', 'creator', 'participants', 'chat', 'games',)
-        fields = ('name', 'date', 'address',)
+        fields = ('id', 'name', 'date', 'address', 'participants', 'creator', 'chat', 'games')
 
 
 class EventSerializer(serializers.ModelSerializer):
