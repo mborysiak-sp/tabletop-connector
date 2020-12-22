@@ -8,17 +8,17 @@ from tabletop_connector_api.events.models import Game
 def geocode_to_address(geocode: tuple):
     def parse_address(address_dict):
         address_dict = {
-            'number': address_dict['house_number'],
-            'street': address_dict.get('road', address_dict.get('village')),
-            'city': address_dict.get('city', address_dict.get('municipality')),
-            'postal_code': address_dict['postcode'],
-            'country': address_dict['country']
+            'number': address_dict['HouseNumber'],
+            'street': address_dict.get('Street'),
+            'city': address_dict.get('City'),
+            'postal_code': address_dict['PostalCode'],
+            'country': address_dict['AdditionalData'][0]['value']
         }
         return address_dict
 
     try:
         address = Here(apikey=os.getenv('HERE_APIKEY')).reverse(geocode)
-        address_components = address.raw['address']
+        address_components = address.raw['Location']['Address']
         parsed_address = parse_address(address_components)
         return parsed_address
     except AttributeError:
@@ -28,19 +28,16 @@ def geocode_to_address(geocode: tuple):
 
 
 def address_to_geocode(address: dict):
+    query = address.get("country", [""]) + " " \
+            + address.get("city", [""]) + " " \
+            + address.get("postal_code", "") + " " \
+            + address.get("street", [""]) + " " \
+            + address.get("number", [""])
     try:
-        result = Here(apikey=os.getenv('HERE_APIKEY')).geocode(
-            address.get("country", [""])[0] + " "
-            + address.get("city", [""])[0] + " "
-            + address.get("postal_code", "")[0] + " "
-            + address.get("street", [""])[0] + " "
-            + address.get("number", [""])[0]
-        )
-        try:
-            return result.latitude, result.longitude
-        except AttributeError:
-            return ()
-
+        result = Here(apikey=os.getenv('HERE_APIKEY')).geocode(query)
+        return result.latitude, result.longitude
+    except AttributeError:
+        return ()
     except IndexError:
         return ()
 
