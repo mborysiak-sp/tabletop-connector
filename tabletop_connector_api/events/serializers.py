@@ -62,15 +62,24 @@ class AddressCreateSerializer(serializers.ModelSerializer):
         validated_data = read_address(validated_data)
         return Address.objects.create(**validated_data)
 
-      
+
+class GameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Game
+        fields = '__all__'
+
+
 class EventCreateSerializer(WritableNestedModelSerializer):
     address = AddressCreateSerializer(many=False)
-    
+    #participants = UserSerializer(many=True, read_only=True)
+    #creator = UserSerializer(many=False, read_only=True)
+    #games = GameSerializer(many=True, read_only=True)
+
     class Meta:
         model = Event
+        read_only_fields = ('id', 'creator', 'participants', 'chat', 'games',)
         fields = ('name', 'date', 'address',)
-
-    read_only_fields = ('creator', 'participants')
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -81,10 +90,3 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'date', 'creator', 'address', 'chat', 'participants',)
-
-
-class GameSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Game
-        fields = '__all__'
