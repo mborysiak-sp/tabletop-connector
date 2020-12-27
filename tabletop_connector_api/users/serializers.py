@@ -35,6 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'profile')
         read_only_fields = ('profile',)
+        ref_name = 'User serializer'
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
