@@ -3,7 +3,7 @@ import uuid
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from tabletop_connector_api.chats.models import Chat
+
 from tabletop_connector_api.users.models import User
 
 
@@ -27,6 +27,10 @@ class Address(models.Model):
                + self.geo_y.__str__()
 
 
+class Chat(models.Model):
+    pass
+
+
 class Game(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=512)
@@ -44,9 +48,8 @@ class Event(models.Model):
     creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, null=True, on_delete=models.SET_NULL)
     chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.SET_NULL)
-    participants = models.ManyToManyField(User, related_name='events')
-    games = models.ManyToManyField(Game, related_name='events')
-
+    participants = models.ManyToManyField(User, related_name='participants')
+    games = models.ManyToManyField(Game, related_name='games', related_query_name='games', blank=True)
 
     def __str__(self):
         return self.name.__str__() + " "\

@@ -3,11 +3,11 @@ from rest_framework import serializers
 
 from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
-
+from ..users.serializers import UserSerializer
 
 
 def read_address(validated_data):
-    if validated_data['geo_x'] and validated_data['geo_y']:
+    if validated_data.get('geo_x') is not None and validated_data.get('geo_y') is not None:
         address = geocode_to_address((
             validated_data['geo_x'],
             validated_data['geo_y']
@@ -21,6 +21,8 @@ def read_address(validated_data):
             raise serializers.ValidationError("Address not found")
     else:
         geocode = address_to_geocode(validated_data)
+        if geocode == ():
+            raise serializers.ValidationError("Address not found")
         try:
             validated_data['geo_x'] = geocode[0]
             validated_data['geo_y'] = geocode[1]
@@ -61,27 +63,31 @@ class AddressCreateSerializer(serializers.ModelSerializer):
         validated_data = read_address(validated_data)
         return Address.objects.create(**validated_data)
 
-      
-class EventCreateSerializer(WritableNestedModelSerializer):
-    address = AddressCreateSerializer(many=False)
-    
-    class Meta:
-        model = Event
-        fields = ('name', 'date', 'address',)
-
-    read_only_fields = ('creator', 'participants')
-
-
-class EventSerializer(serializers.ModelSerializer):
-    address = AddressSerializer(many=False)
-
-    class Meta:
-        model = Event
-        fields = ('id', 'name', 'date', 'creator', 'address', 'chat', 'participants',)
-
 
 class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
         fields = '__all__'
+
+
+class EventCreateSerializer(WritableNestedModelSerializer):
+    address = AddressCreateSerializer(many=False)
+    participants = UserSerializer(many=True, read_only=True)
+    creator = UserSerializer(many=False, read_only=True)
+    games = GameSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Event
+        read_only_fields = ('id', 'creator', 'participants', 'chat', 'games',)
+        fields = ('id', 'name', 'date', 'address', 'participants', 'creator', 'chat', 'games')
+
+
+class EventSerializer(serializers.ModelSerializer):
+    address = AddressSerializer(many=False)
+    participants = UserSerializer(many=True)
+    creator = UserSerializer(many=False)
+
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'date', 'creator', 'address', 'chat', 'participants',)

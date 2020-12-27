@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from os.path import join
 from distutils.util import strtobool
 import dj_database_url
@@ -201,5 +202,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
+    'AUTH_HEADER_TYPES': ('JWT', 'XD'),
+    'ACCESS_TOKEN_LIFETIME ': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME ': timedelta(days=1),
+    'AUDIENCE': '21@totally-not-tabletopconnector-audience@37'
 }

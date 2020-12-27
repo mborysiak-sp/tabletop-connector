@@ -17,8 +17,8 @@ class AddressFactory(DjangoModelFactory):
     street = 'Podwale Grodzkie',
     number = 2,
     postal_code = '80-895'
-    geo_x = 0.0
-    geo_y = 0.0
+    geo_x = None
+    geo_y = None
 
 
 class EventFactory(DjangoModelFactory):
@@ -26,7 +26,7 @@ class EventFactory(DjangoModelFactory):
         model = Event
 
     name = "test"
-    date = datetime(2020, 12, 25, 11, 0, tzinfo=pytz.UTC)
+    date = datetime(2025, 12, 25, 11, 0, tzinfo=pytz.UTC)
     creator = None
     address = SubFactory(AddressFactory)
     chat = None
