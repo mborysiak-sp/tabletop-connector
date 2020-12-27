@@ -57,7 +57,7 @@ class CustomEventAPIView(ListAPIView):
 
         queryset = self.filter_queryset(self.get_queryset())
         if queryset.count() == 0:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
         else:
             serializer = self.serializer_class(queryset, many=True)
             page = self.paginate_queryset(queryset=serializer.data)
