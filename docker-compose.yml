@@ -1,6 +1,11 @@
 version: '2'
 
 services:
+  redis:
+    image: redis
+    env_file: .env
+    ports:
+      - '6379:6379'
   postgres:
     image: postgres:13
     env_file: .env
@@ -16,6 +21,9 @@ services:
     volumes:
       - ./:/code
     ports:
-      - "8000:8000"
+      - '8000:8000'
     depends_on:
       - postgres
+      - redis
+    links:
+      - redis

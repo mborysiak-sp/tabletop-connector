@@ -4,7 +4,6 @@ from os.path import join
 from distutils.util import strtobool
 import dj_database_url
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 INSTALLED_APPS = [
@@ -16,9 +15,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third party apps
-    'rest_framework',            # utilities for rest apis
+    'rest_framework',  # utilities for rest apis
     'rest_framework.authtoken',  # token authentication
-    'django_filters',            # for filtering rest endpoints
+    'django_filters',  # for filtering rest endpoints
     'djoser',
     'drf_yasg',
     'channels',
@@ -206,4 +205,13 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME ': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME ': timedelta(days=1),
     'AUDIENCE': '21@totally-not-tabletopconnector-audience@37'
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }
