@@ -87,7 +87,8 @@ class EventSerializer(serializers.ModelSerializer):
     address = AddressSerializer(many=False)
     participants = UserSerializer(many=True)
     creator = UserSerializer(many=False)
+    games = GameSerializer(many=True)
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'date', 'creator', 'address', 'chat', 'participants',)
+        fields = ('id', 'name', 'date', 'creator', 'address', 'chat', 'participants', 'games')
