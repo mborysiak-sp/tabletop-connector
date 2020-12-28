@@ -12,7 +12,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('auth/', include('djoser.urls.authtoken')),
-    path('auth/profiles/me/', return_me)
+    path('profiles/me/', return_me)
 ]
 
 urlpatterns += router.urls
