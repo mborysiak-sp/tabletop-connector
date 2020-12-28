@@ -1,8 +1,8 @@
 import os
+import dj_database_url
 from datetime import timedelta
 from os.path import join
 from distutils.util import strtobool
-import dj_database_url
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -180,7 +180,11 @@ LOGGING = {
 
 # Custom user app
 AUTH_USER_MODEL = 'users.User'
-
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'tabletop_connector_api.users.serializers.CreateUserSerializer',
+    },
+}
 # Django Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
