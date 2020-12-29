@@ -6,13 +6,13 @@ from .models import User, Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    image = SerializerMethodField()
+    avatar = SerializerMethodField()
 
     class Meta:
         model = Profile
         fields = ('id', 'firstname', 'lastname', 'avatar')
 
-    def get_image(self, profile):
+    def get_avatar(self, profile):
         request = self.context.get('request')
         if profile and hasattr(profile, 'avatar'):
             avatar = profile.avatar.url
