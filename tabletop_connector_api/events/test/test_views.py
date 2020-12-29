@@ -15,9 +15,9 @@ from tabletop_connector_api.events.views import CustomEventAPIView, EventViewSet
 @pytest.mark.django_db
 class TestCustomEventViewSet(TestCase):
 
-    @pytest.fixture(autouse=True)
-    def delay(self):
-        sleep(1)
+    # @pytest.fixture(autouse=True)
+    # def delay(self):
+    #     sleep(1)
 
     def setUp(self):
         self.view = CustomEventAPIView.as_view()
@@ -159,7 +159,7 @@ class TestEventViewSet(TestCase):
     @pytest.fixture(autouse=True)
     def reset(self):
         self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'})
-        sleep(1)
+        # sleep(1)
 
     def setUp(self):
         self.factory = APIRequestFactory()

@@ -9,6 +9,12 @@ from tabletop_connector_api.events.models import Event
 from tabletop_connector_api.events.utils import address_to_geocode, get_distance_in_kilometers
 
 
+def unpack_from_list(dictionary: dict, key):
+    val = dictionary.get(key, None)
+    if isinstance(val, list):
+        dictionary[key] = dictionary.get(key)[0]
+
+
 class FilterByDistance(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
@@ -22,6 +28,9 @@ class FilterByDistance(filters.BaseFilterBackend):
 
         if geo_x is None or geo_y is None:
             address_data = dict(request.query_params)
+            for key in address_data:
+                unpack_from_list(address_data, key)
+
             address_data.pop('distance', 0.0)
             geocode_from = address_to_geocode(address_data)
             if geocode_from == ():
