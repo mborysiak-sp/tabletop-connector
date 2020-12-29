@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, views, status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser
 
 from .models import User, Profile
-from .permissions import IsUserOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsUserOrReadOnly, IsOwnerOrReadOnly, IsOwner
 from .serializers import ProfileSerializer, CreateProfileSerializer
 
 
@@ -24,7 +26,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
 
-@api_view(['GET'])
-def return_me(request):
-    user_profile = get_object_or_404(Profile, user=request.user)
-    return Response(ProfileSerializer(user_profile, many=False).data, status.HTTP_200_OK)
+class ProfileMeAPIView(RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = (IsAuthenticated, IsOwner,)
+
+    def get_object(self):
+        return Profile.objects.get(user=self.request.user)
