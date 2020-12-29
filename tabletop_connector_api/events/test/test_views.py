@@ -343,6 +343,7 @@ class TestJoinLeaveEvent(TestCase):
         event = EventFactory(creator=self.user)
         request = self.factory.patch('api/participation/')
         force_authenticate(request, user=self.user_2)
+
         assert self.view(request, pk=event.pk).status_code == 200
 
     def test_if_joined_not_creator_in_participants(self):
