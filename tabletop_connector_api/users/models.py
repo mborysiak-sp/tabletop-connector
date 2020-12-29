@@ -17,5 +17,5 @@ class Profile(models.Model):
     firstname = models.TextField(blank=True, null=True, max_length=64)
     lastname = models.CharField(blank=True, null=True, max_length=64)
     date_joined = models.DateTimeField(auto_now_add=True)
-    avatar = models.ImageField(upload_to='avatars/', default='default_avatar.png')
+    avatar = models.ImageField(upload_to='avatars/', default='./avatars/default_avatar.png', )
 
