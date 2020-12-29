@@ -6,17 +6,17 @@ from .models import User, Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    image = SerializerMethodField()
+    avatar = SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ('id', 'firstname', 'lastname', 'image')
+        fields = ('id', 'firstname', 'lastname', 'avatar')
 
-    def get_image(self, profile):
+    def get_avatar(self, profile):
         request = self.context.get('request')
-        if profile and hasattr(profile, 'image'):
-            image = profile.image.url
-            return request.build_absolute_uri(image)
+        if profile and hasattr(profile, 'avatar'):
+            avatar = profile.avatar.url
+            return request.build_absolute_uri(avatar)
         else:
             return None
 
@@ -40,6 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(WritableNestedModelSerializer):
     profile = CreateProfileSerializer(many=False)
+
+    def create(self, validated_data):
+        # call create_user on user object. Without this
+        # the password will be stored in plain text.
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create_user(**validated_data)
+        Profile.objects.create(user=user, **profile_data)
+        return user
 
     class Meta:
         model = User
