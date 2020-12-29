@@ -1,6 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, filters, generics
-from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
+from rest_framework.decorators import (
+    action,
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
 from rest_framework.generics import ListAPIView
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.pagination import PageNumberPagination
@@ -8,8 +13,13 @@ from rest_framework.response import Response
 
 from .filters import FilterByDistance, FilterByDate
 from .models import Address, Event, Game
-from .serializers import AddressSerializer, EventSerializer, EventCreateSerializer, AddressCreateSerializer, \
-    GameSerializer
+from .serializers import (
+    AddressSerializer,
+    EventSerializer,
+    EventCreateSerializer,
+    AddressCreateSerializer,
+    GameSerializer,
+)
 
 
 class AddressViewSet(viewsets.ModelViewSet):
@@ -19,7 +29,7 @@ class AddressViewSet(viewsets.ModelViewSet):
     queryset = Address.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ('update', 'partial_update', 'create'):
+        if self.action in ("update", "partial_update", "create"):
             return AddressCreateSerializer
         return super().get_serializer_class()
 
@@ -29,13 +39,13 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ('update', 'partial_update', 'create'):
+        if self.action in ("update", "partial_update", "create"):
             return EventCreateSerializer
         return super().get_serializer_class()
 
     def perform_create(self, serializer):
         user = self.request.user
-        serializer.save(creator=self.request.user, participants=[self.request.user, ])
+        serializer.save(creator=self.request.user, participants=[self.request.user,])
 
 
 class CustomEventAPIView(ListAPIView):
@@ -43,9 +53,18 @@ class CustomEventAPIView(ListAPIView):
     permission_classes = ()
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
-    filter_backends = [filters.SearchFilter, FilterByDate, FilterByDistance, filters.OrderingFilter]
-    search_fields = ['name', ]  # describe here which fields want to use for searching, then we use search=*
-    ordering_fields = ['date', ]  # describe here which fields want to use for ordering, then we use order=(-)field
+    filter_backends = [
+        filters.SearchFilter,
+        FilterByDate,
+        FilterByDistance,
+        filters.OrderingFilter,
+    ]
+    search_fields = [
+        "name",
+    ]  # describe here which fields want to use for searching, then we use search=*
+    ordering_fields = [
+        "date",
+    ]  # describe here which fields want to use for ordering, then we use order=(-)field
 
     def get_queryset(self):
 
@@ -70,12 +89,12 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GameSerializer
     filter_backends = [filters.SearchFilter]
     filter_class = Game
-    search_fields = ['name']
+    search_fields = ["name"]
     authentication_classes = ()
     permission_classes = ()
 
 
-@api_view(['PATCH'])
+@api_view(["PATCH"])
 def join_leave_event(request, pk):
     event = get_object_or_404(Event, pk=pk)
 

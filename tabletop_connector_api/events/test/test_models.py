@@ -8,18 +8,17 @@ from tabletop_connector_api.events.test.factories import AddressFactory, EventFa
 
 @pytest.mark.django_db
 class TestAddressModel:
-
     def test_address_invalid_postal_code(self):
         with pytest.raises(DataError):
-            AddressFactory.create(postal_code="*"*7)
+            AddressFactory.create(postal_code="*" * 7)
 
     def test_address_invalid_country(self):
         with pytest.raises(DataError):
-            AddressFactory.create(country="*"*65)
+            AddressFactory.create(country="*" * 65)
 
     def test_address_invalid_city(self):
         with pytest.raises(DataError):
-            AddressFactory.create(city="*"*65)
+            AddressFactory.create(city="*" * 65)
 
     def test_address_invalid_number(self):
         with pytest.raises(DataError):
@@ -32,7 +31,6 @@ class TestAddressModel:
 
 @pytest.mark.django_db
 class TestEventModel:
-
     def test_event_invalid_name(self):
         with pytest.raises(DataError):
             EventFactory.create(name="*" * 65)
@@ -40,5 +38,3 @@ class TestEventModel:
     def test_event_valid(self):
         event = EventFactory()
         assert Address.objects.count() == 1
-
-

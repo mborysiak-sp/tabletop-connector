@@ -9,28 +9,34 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('events', '0001_initial'),
+        ("events", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='address',
-            name='geo_x',
-            field=models.FloatField(default=0.0),
+            model_name="address", name="geo_x", field=models.FloatField(default=0.0),
         ),
         migrations.AddField(
-            model_name='address',
-            name='geo_y',
-            field=models.FloatField(default=0.0),
+            model_name="address", name="geo_y", field=models.FloatField(default=0.0),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='chat',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='events.chat'),
+            model_name="event",
+            name="chat",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="events.chat",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='creator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="creator",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

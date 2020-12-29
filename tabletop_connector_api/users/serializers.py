@@ -10,11 +10,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'firstname', 'lastname', 'image')
+        fields = ("id", "firstname", "lastname", "image")
 
     def get_image(self, profile):
-        request = self.context.get('request')
-        if profile and hasattr(profile, 'image'):
+        request = self.context.get("request")
+        if profile and hasattr(profile, "image"):
             image = profile.image.url
             return request.build_absolute_uri(image)
         else:
@@ -22,10 +22,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Profile
-        fields = ('firstname', 'lastname', 'avatar')
+        fields = ("firstname", "lastname", "avatar")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,9 +32,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'profile')
-        read_only_fields = ('profile',)
-        ref_name = 'User serializer'
+        fields = ("id", "username", "profile")
+        read_only_fields = ("profile",)
+        ref_name = "User serializer"
 
 
 class CreateUserSerializer(WritableNestedModelSerializer):
@@ -43,5 +42,5 @@ class CreateUserSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'profile')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ("username", "password", "email", "profile")
+        extra_kwargs = {"password": {"write_only": True}}

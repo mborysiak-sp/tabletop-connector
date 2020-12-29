@@ -13,9 +13,8 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     firstname = models.TextField(blank=False, null=False, max_length=64)
     lastname = models.CharField(blank=False, null=False, max_length=64)
     date_joined = models.DateTimeField(auto_now_add=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
