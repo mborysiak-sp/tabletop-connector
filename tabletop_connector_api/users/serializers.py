@@ -10,13 +10,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'firstname', 'lastname', 'image')
+        fields = ('id', 'firstname', 'lastname', 'avatar')
 
     def get_image(self, profile):
         request = self.context.get('request')
-        if profile and hasattr(profile, 'image'):
-            image = profile.image.url
-            return request.build_absolute_uri(image)
+        if profile and hasattr(profile, 'avatar'):
+            avatar = profile.avatar.url
+            return request.build_absolute_uri(avatar)
         else:
             return None
 
