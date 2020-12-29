@@ -41,6 +41,14 @@ class UserSerializer(serializers.ModelSerializer):
 class CreateUserSerializer(WritableNestedModelSerializer):
     profile = CreateProfileSerializer(many=False)
 
+    def create(self, validated_data):
+        # call create_user on user object. Without this
+        # the password will be stored in plain text.
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create_user(**validated_data)
+        Profile.objects.create(user=user, **profile_data)
+        return user
+
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'profile')
