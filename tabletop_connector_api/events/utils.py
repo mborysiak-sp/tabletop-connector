@@ -28,6 +28,8 @@ def geocode_to_address(geocode: tuple):
         return ()
     except TypeError:
         return ()
+    except ValueError:
+        return ()
 
 
 def address_to_geocode(address: dict):

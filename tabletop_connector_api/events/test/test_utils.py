@@ -59,3 +59,8 @@ def test_geocode_to_address():
     assert address['city'] == 'Gdańsk'
     assert address['street'] == 'ulica Wita Stwosza'
 
+
+def test_geocode_to_address_invalid_input():
+    assert geocode_to_address((1000, 1000)) == ()
+
+
