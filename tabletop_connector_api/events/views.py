@@ -45,7 +45,12 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        serializer.save(creator=self.request.user, participants=[self.request.user,])
+        serializer.save(
+            creator=self.request.user,
+            participants=[
+                self.request.user,
+            ],
+        )
 
 
 class CustomEventAPIView(ListAPIView):

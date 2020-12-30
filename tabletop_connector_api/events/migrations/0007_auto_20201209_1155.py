@@ -17,6 +17,8 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name="game", name="name", field=models.CharField(max_length=512),
+            model_name="game",
+            name="name",
+            field=models.CharField(max_length=512),
         ),
     ]

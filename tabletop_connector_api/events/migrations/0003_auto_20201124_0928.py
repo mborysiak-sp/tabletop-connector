@@ -11,9 +11,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="address", name="geo_x", field=models.FloatField(default=None),
+            model_name="address",
+            name="geo_x",
+            field=models.FloatField(default=None),
         ),
         migrations.AlterField(
-            model_name="address", name="geo_y", field=models.FloatField(default=None),
+            model_name="address",
+            name="geo_y",
+            field=models.FloatField(default=None),
         ),
     ]

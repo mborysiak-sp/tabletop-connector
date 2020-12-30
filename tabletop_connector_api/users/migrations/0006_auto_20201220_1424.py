@@ -16,5 +16,7 @@ class Migration(migrations.Migration):
             field=models.ImageField(default="aaaaaaaaa", upload_to="avatars/"),
             preserve_default=False,
         ),
-        migrations.DeleteModel(name="Image",),
+        migrations.DeleteModel(
+            name="Image",
+        ),
     ]

@@ -33,5 +33,7 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
-        migrations.DeleteModel(name="Avatar",),
+        migrations.DeleteModel(
+            name="Avatar",
+        ),
     ]

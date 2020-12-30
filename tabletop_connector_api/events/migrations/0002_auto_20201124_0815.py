@@ -14,10 +14,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="address", name="geo_x", field=models.FloatField(default=0.0),
+            model_name="address",
+            name="geo_x",
+            field=models.FloatField(default=0.0),
         ),
         migrations.AddField(
-            model_name="address", name="geo_y", field=models.FloatField(default=0.0),
+            model_name="address",
+            name="geo_y",
+            field=models.FloatField(default=0.0),
         ),
         migrations.AlterField(
             model_name="event",
