@@ -1,14 +1,13 @@
-from django.shortcuts import get_object_or_404
-from djoser.serializers import UserSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework import viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import viewsets, mixins, views, status
-from rest_framework.decorators import api_view
-from rest_framework.parsers import MultiPartParser
 
-from .models import User, Profile
-from .permissions import IsUserOrReadOnly, IsOwnerOrReadOnly, IsOwner
+from .models import Profile
+from .permissions import IsOwnerOrReadOnly, IsOwner
 from .serializers import ProfileSerializer, CreateProfileSerializer
 
 
@@ -30,7 +29,22 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class ProfileMeAPIView(RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = (IsAuthenticated, IsOwner,)
+    permission_classes = (
+        IsAuthenticated,
+        IsOwner,
+    )
 
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+
+class TokenObtainView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        token, created = Token.objects.get_or_create(user=user)
+        custom_response = {"auth_token": token.key, "user_id": user.id}
+        return Response(custom_response)

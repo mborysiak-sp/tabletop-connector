@@ -10,11 +10,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'firstname', 'lastname', 'avatar')
+        fields = ("id", "firstname", "lastname", "avatar")
 
     def get_avatar(self, profile):
-        request = self.context.get('request')
-        if profile and hasattr(profile, 'avatar'):
+        request = self.context.get("request")
+        if profile and hasattr(profile, "avatar"):
             avatar = profile.avatar.url
             return request.build_absolute_uri(avatar)
         else:
@@ -43,7 +43,7 @@ class CreateUserSerializer(WritableNestedModelSerializer):
     def create(self, validated_data):
         # call create_user on user object. Without this
         # the password will be stored in plain text.
-        profile_data = validated_data.pop('profile')
+        profile_data = validated_data.pop("profile")
         user = User.objects.create_user(**validated_data)
         Profile.objects.create(user=user, **profile_data)
         return user
