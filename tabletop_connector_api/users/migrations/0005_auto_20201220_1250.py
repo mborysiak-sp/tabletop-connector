@@ -8,19 +8,32 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_avatar'),
+        ("users", "0004_avatar"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Image',
+            name="Image",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('file', models.ImageField(upload_to='images/')),
-                ('profile', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='users.profile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("file", models.ImageField(upload_to="images/")),
+                (
+                    "profile",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="users.profile"
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(
-            name='Avatar',
+            name="Avatar",
         ),
     ]
