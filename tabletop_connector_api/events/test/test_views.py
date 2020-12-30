@@ -211,20 +211,13 @@ class TestEventViewSet(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = UserFactory()
-        self.example = {'name': 'test',
-                        'date': '2020-12-14T20:09:00+0000',
-                        'creator': None,
-                        'address': {
-                            'country': 'Poland',
-                            'city': 'Gdansk',
-                            'street': 'Wita Stwosza',
-                            'postal_code': '21-307',
-                            'number': '2',
-                            'geo_x': None,
-                            'geo_y': None
-                        },
-                        'chat': None,
-                        'participants': None
+        self.example = {"name": "TEST 1",
+                        "date": "2020-12-30T16:01:00+0000",
+                        "address":
+                            {
+                                "geo_x": 54.395704550000005,
+                                "geo_y": 18.5739726651911
+                            }
                         }
 
     def test_get_all_events(self):
@@ -267,13 +260,11 @@ class TestEventViewSet(TestCase):
         assert Event.objects.count() == 1
 
     def test_create_valid_event_creator_is_participant(self):
-        example_with_creator = self.example.copy()
-        example_with_creator["creator"] = self.user.pk
         request = self.factory.post(
             reverse("events:event-list"), self.example, format="json"
         )
         force_authenticate(request, user=self.user)
-        self.view(request)
+        print(self.view(request))
 
         assert self.user in Event.objects.get(creator=self.user.pk).participants.all()
 
@@ -335,10 +326,9 @@ class TestEventViewSet(TestCase):
     def test_update_event_with_not_existing_address(self):
         event = EventFactory()
         incorrect_example = self.example.copy()
-        incorrect_example["address"]["country"] = ""
-        incorrect_example["address"]["city"] = ""
-        incorrect_example["address"]["street"] = ""
-        incorrect_example["address"]["number"] = ""
+        incorrect_example["address"]["geo_x"] = 1000
+        incorrect_example["address"]["geo_y"] = 1000
+
         request = self.factory.put(
             reverse("events:event-list"), incorrect_example, format="json"
         )
@@ -356,7 +346,7 @@ class TestEventViewSet(TestCase):
         changed_event = Event.objects.get(pk=event.pk)
 
         assert changed_event.name == self.example["name"]
-        assert changed_event.address.street == self.example["address"]["street"]
+        assert changed_event.address.geo_x == self.example["address"]["geo_x"]
 
     def test_update_event_unauthenticated(self):
         event = EventFactory()

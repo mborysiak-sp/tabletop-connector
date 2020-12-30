@@ -12,13 +12,13 @@ class AddressFactory(DjangoModelFactory):
     class Meta:
         model = Address
 
-    country = ("Poland",)
-    city = ("Gdansk",)
-    street = ("Podwale Grodzkie",)
-    number = (2,)
+    country = "Poland"
+    city = "Gdansk"
+    street = "Podwale Grodzkie"
+    number = "2"
     postal_code = "80-895"
-    geo_x = None
-    geo_y = None
+    geo_x = 0
+    geo_y = 0
 
 
 class EventFactory(DjangoModelFactory):
