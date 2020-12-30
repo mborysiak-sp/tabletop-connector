@@ -27,9 +27,10 @@ from tabletop_connector_api.events.views import (
 
 @pytest.mark.django_db
 class TestCustomEventViewSet(TestCase):
-    @pytest.fixture(autouse=True)
-    def delay(self):
-        sleep(1)
+
+    # @pytest.fixture(autouse=True)
+    # def delay(self):
+    #     sleep(1)
 
     def setUp(self):
         self.view = CustomEventAPIView.as_view()
@@ -39,118 +40,144 @@ class TestCustomEventViewSet(TestCase):
         self.assertEqual(CustomEventAPIView.serializer_class, EventSerializer)
 
     def test_found_response_code(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
-        )
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 200
 
     def test_found_in_queryset(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
 
-        EventFactory(
-            address=AddressFactory(
-                city="Wroclaw",
-                street="Sanocka",
-                number="9",
-                geo_x=51.09421,
-                geo_y=17.02858,
-            )
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
-        )
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
-        assert self.view(request).data.get("count") == 1
+        assert self.view(request).data.get('count') == 1
+
+    def test_found_by_geocode_in_queryset(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
+        request = self.factory \
+            .get('events/search/?distance=10&geo_x=51.09421&geo_y=17.02858')
+
+        assert self.view(request).data.get('count') == 1
+
+    def test_not_found_by_geocode_in_queryset(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
+        request = self.factory \
+            .get('events/search/?distance=10&geo_x=1.0&geo_y=1.0')
+
+        assert self.view(request).data is None
 
     def test_not_found_response_code(self):
-        EventFactory(
-            address=AddressFactory(
-                city="Wroclaw",
-                street="Sanocka",
-                number="9",
-                geo_x=51.09421,
-                geo_y=17.02858,
-            )
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
-        )
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9',
+                                            geo_x=51.09421,
+                                            geo_y=17.02858))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).status_code == 204
 
+    def test_when_no_distance_specified(self):
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9'))
+        request = self.factory \
+            .get('events/search/?country=Poland&city=Gdansk&street=Teatralna')
+        assert self.view(request).data.get('count') == 1
+
     def test_when_address_no_specified(self):
-        EventFactory(
-            address=AddressFactory(city="Wroclaw", street="Sanocka", number="9")
-        )
-        request = self.factory.get("api/geteventbydistance/?distance=10")
+        EventFactory(address=AddressFactory(city='Wroclaw',
+                                            street='Sanocka',
+                                            number='9'))
+        request = self.factory \
+            .get('events/search/?distance=10')
 
         assert self.view(request).status_code == 204
 
     def test_search(self):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
 
-        EventFactory(name="xyz", address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        request = self.factory.get(
-            "api/geteventbydistance/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna"
-        )
+        EventFactory(name='xyz',
+                     address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna')
 
         assert self.view(request).data.get("count") == 1
 
     def test_with_date_from_found(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        EventFactory(
-            date=datetime(2010, 12, 25, 11, 0, tzinfo=pytz.UTC),
-            address=AddressFactory(geo_x=54.34950, geo_y=18.64847),
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2011-1-1"
-        )
+
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        EventFactory(date=datetime(2010, 12, 25, 11, 0, tzinfo=pytz.UTC),
+                     address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2011-1-1')
 
         assert self.view(request).data.get("count") == 1
 
     def test_with_date_from_not_found(self):
-        EventFactory(
-            date=datetime(2010, 12, 25, 11, 0, tzinfo=pytz.UTC),
-            address=AddressFactory(geo_x=54.34950, geo_y=18.64847),
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2031-1-1"
-        )
+        EventFactory(date=datetime(2010, 12, 25, 11, 0, tzinfo=pytz.UTC), address=AddressFactory(geo_x=54.34950,
+                                                                                                 geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2031-1-1')
 
         assert not self.view(request).data
 
     def test_with_date_to_found(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        EventFactory(
-            date=datetime(2032, 12, 25, 11, 0, tzinfo=pytz.UTC),
-            address=AddressFactory(geo_x=54.34950, geo_y=18.64847),
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2031-1-1"
-        )
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        EventFactory(date=datetime(2032, 12, 25, 11, 0, tzinfo=pytz.UTC),
+                     address=AddressFactory(
+                         geo_x=54.34950,
+                         geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2031-1-1')
 
         assert self.view(request).data.get("count") == 1
 
     def test_with_date_to_not_found(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        request = self.factory.get(
-            "api/geteventbydistance/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2011-1-1"
-        )
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2011-1-1')
 
         assert not self.view(request).data
 
     def test_with_date_from_and_date_to_found(self):
-        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
-        EventFactory(
-            date=datetime(2032, 12, 25, 11, 0, tzinfo=pytz.UTC),
-            address=AddressFactory(geo_x=54.34950, geo_y=18.64847),
-        )
-        request = self.factory.get(
-            "api/geteventbydistance/"
-            "?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2020-1-1&date_to=2031-1-1"
-        )
+        EventFactory(address=AddressFactory(geo_x=54.34950,
+                                            geo_y=18.64847))
+        EventFactory(date=datetime(2032, 12, 25, 11, 0, tzinfo=pytz.UTC),
+                     address=AddressFactory(
+                         geo_x=54.34950,
+                         geo_y=18.64847))
+        request = self.factory \
+            .get('events/search/'
+                 '?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2020-1-1&date_to=2031-1-1')
 
         assert self.view(request).data.get("count") == 1
 
@@ -178,30 +205,27 @@ class TestAddressViewSet(TestCase):
 class TestEventViewSet(TestCase):
     @pytest.fixture(autouse=True)
     def reset(self):
-        self.view = EventViewSet.as_view(
-            {"get": "list", "post": "create", "put": "update", "delete": "destroy"}
-        )
-        sleep(1)
+        self.view = EventViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'})
+        # sleep(1)
 
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = UserFactory()
-        self.example = {
-            "name": "test",
-            "date": "2020-12-14T20:09:00+0000",
-            "creator": None,
-            "address": {
-                "country": "Poland",
-                "city": "Gdansk",
-                "street": "Wita Stwosza",
-                "postal_code": "21-307",
-                "number": "2",
-                "geo_x": None,
-                "geo_y": None,
-            },
-            "chat": None,
-            "participants": None,
-        }
+        self.example = {'name': 'test',
+                        'date': '2020-12-14T20:09:00+0000',
+                        'creator': None,
+                        'address': {
+                            'country': 'Poland',
+                            'city': 'Gdansk',
+                            'street': 'Wita Stwosza',
+                            'postal_code': '21-307',
+                            'number': '2',
+                            'geo_x': None,
+                            'geo_y': None
+                        },
+                        'chat': None,
+                        'participants': None
+                        }
 
     def test_get_all_events(self):
         EventFactory()
@@ -255,10 +279,8 @@ class TestEventViewSet(TestCase):
 
     def test_create_invalid_event(self):
         incorrect_example = self.example.copy()
-        incorrect_example["name"] = "*" * 100
-        request = self.factory.post(
-            reverse("events:event-list"), incorrect_example, format="json"
-        )
+        incorrect_example['name'] = '*' * 100
+        request = self.factory.post(reverse('events:event-list'), incorrect_example, format='json')
         force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 400
@@ -384,6 +406,7 @@ class TestJoinLeaveEvent(TestCase):
         event = EventFactory(creator=self.user)
         request = self.factory.patch("api/participation/")
         force_authenticate(request, user=self.user_2)
+
         assert self.view(request, pk=event.pk).status_code == 200
 
     def test_if_joined_not_creator_in_participants(self):

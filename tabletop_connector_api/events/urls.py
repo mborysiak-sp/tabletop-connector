@@ -20,11 +20,9 @@ router.register(r"addresses", AddressViewSet, basename="address")
 
 app_name = "events"
 urlpatterns = [
-    path("geteventbydistance/", CustomEventAPIView.as_view()),
-    re_path(
-        r"participation/(?P<pk>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$",
-        join_leave_event,
-    ),
+    path('events/search/', CustomEventAPIView.as_view()),
+    re_path(r'participation/(?P<pk>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+            join_leave_event)
 ]
 
 urlpatterns += router.urls
