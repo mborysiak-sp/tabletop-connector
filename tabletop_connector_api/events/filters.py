@@ -1,8 +1,5 @@
-import re
-from abc import ABC
 from datetime import datetime, timedelta
 
-import pytz
 from rest_framework import filters
 
 from tabletop_connector_api.events.models import Event
@@ -20,20 +17,20 @@ def unpack_from_list(dictionary: dict, key):
 
 class FilterByDistance(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        distance = request.query_params.get('distance', None)
+        distance = request.query_params.get("distance", None)
         if not queryset or distance is None:
             return queryset
 
         distance = float(distance)
-        geo_x = request.query_params.get('geo_x', None)
-        geo_y = request.query_params.get('geo_y', None)
+        geo_x = request.query_params.get("geo_x", None)
+        geo_y = request.query_params.get("geo_y", None)
 
         if geo_x is None or geo_y is None:
             address_data = dict(request.query_params)
             for key in address_data:
                 unpack_from_list(address_data, key)
 
-            address_data.pop('distance', 0.0)
+            address_data.pop("distance", 0.0)
             geocode_from = address_to_geocode(address_data)
             if geocode_from == ():
                 queryset = Event.objects.none()
@@ -41,10 +38,14 @@ class FilterByDistance(filters.BaseFilterBackend):
             geo_x = geocode_from[0]
             geo_y = geocode_from[1]
 
-        nearly_events = [x.id for x in queryset if get_distance_in_kilometers(x.address.geo_x,
-                                                                              x.address.geo_y,
-                                                                              float(geo_x),
-                                                                              float(geo_y)) <= distance]
+        nearly_events = [
+            x.id
+            for x in queryset
+            if get_distance_in_kilometers(
+                x.address.geo_x, x.address.geo_y, float(geo_x), float(geo_y)
+            )
+            <= distance
+        ]
 
         queryset = queryset.filter(id__in=nearly_events)
         return queryset
