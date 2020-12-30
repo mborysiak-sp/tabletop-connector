@@ -16,12 +16,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
     """
     Updates and retrieves user accounts
     """
+
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action in ('update', 'partial_update', 'create'):
+        if self.action in ("update", "partial_update", "create"):
             return CreateProfileSerializer
         return super().get_serializer_class()
 

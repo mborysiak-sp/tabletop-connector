@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0002_auto_20201124_0815'),
+        ("events", "0002_auto_20201124_0815"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='address',
-            name='geo_x',
+            model_name="address",
+            name="geo_x",
             field=models.FloatField(default=None),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='geo_y',
+            model_name="address",
+            name="geo_y",
             field=models.FloatField(default=None),
         ),
     ]

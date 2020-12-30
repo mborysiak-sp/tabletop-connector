@@ -28,3 +28,7 @@ Run tests
 ```bash
 docker-compose run web pytest --cov
 ```
+Run black
+```bash
+docker-compose run web black tabletop_connector_api/
+```

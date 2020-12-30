@@ -6,17 +6,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = True
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 NOSE_ARGS = [
     BASE_DIR,
-    '-s',
-    '--nologcapture',
-    '--with-coverage',
-    '--with-progressive',
-    '--cover-package=tabletop_connector_api'
+    "-s",
+    "--nologcapture",
+    "--with-coverage",
+    "--with-progressive",
+    "--cover-package=tabletop_connector_api",
 ]
 
 # Mail
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = "localhost"
 EMAIL_PORT = 1025
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
