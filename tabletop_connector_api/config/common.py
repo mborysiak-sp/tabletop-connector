@@ -198,13 +198,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     )
-}
-
-SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT', 'XD'),
-    'ACCESS_TOKEN_LIFETIME ': timedelta(days=21),
-    'REFRESH_TOKEN_LIFETIME ': timedelta(days=37),
-    'AUDIENCE': '21@totally-not-tabletopconnector-audience@37'
 }

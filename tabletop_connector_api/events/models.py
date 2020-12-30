@@ -9,13 +9,13 @@ from tabletop_connector_api.users.models import User
 
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    country = models.CharField(max_length=64)
-    city = models.CharField(max_length=64)
-    street = models.CharField(max_length=128)
-    postal_code = models.CharField(max_length=6)
-    number = models.CharField(max_length=64)
-    geo_x = models.FloatField(null=True, blank=True, default=0.0)
-    geo_y = models.FloatField(null=True, blank=True, default=0.0)
+    country = models.CharField(max_length=64, blank=True)
+    city = models.CharField(max_length=64, blank=True)
+    street = models.CharField(max_length=128, blank=True)
+    postal_code = models.CharField(max_length=6, blank=True)
+    number = models.CharField(max_length=64, blank=True)
+    geo_x = models.FloatField(blank=True, default=0.0)
+    geo_y = models.FloatField(blank=True, default=0.0)
 
     def __str__(self):
         return self.country.__str__() + " " \
