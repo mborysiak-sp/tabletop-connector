@@ -1,8 +1,8 @@
 import math
 import os
+
 import pandas as pd
 from geopy import Here
-from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQueryError
 
 from tabletop_connector_api.events.models import Game
@@ -18,6 +18,7 @@ def geocode_to_address(geocode: tuple):
             "country": address_dict["AdditionalData"][0]["value"],
         }
         return address_dict
+
     try:
         address = Here(apikey=os.getenv("HERE_APIKEY")).reverse(geocode)
         address_components = address.raw["Location"]["Address"]
@@ -34,11 +35,17 @@ def geocode_to_address(geocode: tuple):
 
 
 def address_to_geocode(address: dict):
-    query = address.get("country", "") + " " \
-            + address.get("city", "") + " " \
-            + address.get("postal_code", "") + " " \
-            + address.get("street", "") + " " \
-            + address.get("number", "")
+    query = (
+        address.get("country", "")
+        + " "
+        + address.get("city", "")
+        + " "
+        + address.get("postal_code", "")
+        + " "
+        + address.get("street", "")
+        + " "
+        + address.get("number", "")
+    )
     try:
         result = Here(apikey=os.getenv("HERE_APIKEY")).geocode(query)
         return result.latitude, result.longitude
