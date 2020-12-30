@@ -16,31 +16,75 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Address',
+            name="Address",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('country', models.CharField(max_length=64)),
-                ('city', models.CharField(max_length=64)),
-                ('street', models.CharField(max_length=128)),
-                ('postal_code', models.CharField(max_length=6)),
-                ('number', models.CharField(max_length=64)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("country", models.CharField(max_length=64)),
+                ("city", models.CharField(max_length=64)),
+                ("street", models.CharField(max_length=128)),
+                ("postal_code", models.CharField(max_length=6)),
+                ("number", models.CharField(max_length=64)),
             ],
         ),
         migrations.CreateModel(
-            name='Chat',
+            name="Chat",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=64)),
-                ('date', models.DateTimeField()),
-                ('address', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='events.address')),
-                ('chat', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='events.chat')),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                ("date", models.DateTimeField()),
+                (
+                    "address",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="events.address",
+                    ),
+                ),
+                (
+                    "chat",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="events.chat",
+                    ),
+                ),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

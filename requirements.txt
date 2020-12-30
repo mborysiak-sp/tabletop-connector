@@ -25,6 +25,7 @@ ipdb==0.13.4
 ipython==7.18.1
 mkdocs==1.1.2
 flake8==3.8.4
+black~=20.8b0
 
 # Testing
 mock==4.0.2

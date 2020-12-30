@@ -6,11 +6,19 @@ import pytz
 from rest_framework import filters
 
 from tabletop_connector_api.events.models import Event
-from tabletop_connector_api.events.utils import address_to_geocode, get_distance_in_kilometers
+from tabletop_connector_api.events.utils import (
+    address_to_geocode,
+    get_distance_in_kilometers,
+)
+
+
+def unpack_from_list(dictionary: dict, key):
+    val = dictionary.get(key, None)
+    if isinstance(val, list):
+        dictionary[key] = dictionary.get(key)[0]
 
 
 class FilterByDistance(filters.BaseFilterBackend):
-
     def filter_queryset(self, request, queryset, view):
         distance = request.query_params.get('distance', None)
         if not queryset or distance is None:
@@ -22,6 +30,9 @@ class FilterByDistance(filters.BaseFilterBackend):
 
         if geo_x is None or geo_y is None:
             address_data = dict(request.query_params)
+            for key in address_data:
+                unpack_from_list(address_data, key)
+
             address_data.pop('distance', 0.0)
             geocode_from = address_to_geocode(address_data)
             if geocode_from == ():
@@ -40,23 +51,20 @@ class FilterByDistance(filters.BaseFilterBackend):
 
 
 class FilterByDate(filters.BaseFilterBackend):
-
     def filter_queryset(self, request, queryset, view):
         if not queryset:
             return queryset
 
-        date_from = request.query_params.get('date_from', None)
-        date_to = request.query_params.get('date_to', None)
+        date_from = request.query_params.get("date_from", None)
+        date_to = request.query_params.get("date_to", None)
         now = datetime.now()
         if date_from is None:
             date_from = now
         else:
             try:
-                date_from = datetime.strptime(date_from, '%Y-%m-%d')
+                date_from = datetime.strptime(date_from, "%Y-%m-%d")
                 if date_from < datetime.now():
                     date_from = datetime.now()
-
-
 
             except ValueError:
                 return queryset
@@ -67,7 +75,7 @@ class FilterByDate(filters.BaseFilterBackend):
             return queryset
 
         try:
-            date_to = datetime.strptime(date_to, '%Y-%m-%d')
+            date_to = datetime.strptime(date_to, "%Y-%m-%d")
             print(date_to)
             date_to = date_to + timedelta(days=1)
             print(date_to)
