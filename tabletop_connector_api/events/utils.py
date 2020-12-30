@@ -18,7 +18,6 @@ def geocode_to_address(geocode: tuple):
             "country": address_dict["AdditionalData"][0]["value"],
         }
         return address_dict
-
     try:
         address = Here(apikey=os.getenv("HERE_APIKEY")).reverse(geocode)
         address_components = address.raw["Location"]["Address"]
@@ -27,6 +26,8 @@ def geocode_to_address(geocode: tuple):
     except AttributeError:
         return ()
     except TypeError:
+        return ()
+    except KeyError:
         return ()
     except ValueError:
         return ()
