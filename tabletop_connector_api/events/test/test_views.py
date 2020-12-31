@@ -199,6 +199,27 @@ class TestCustomEventViewSet(TestCase):
 
         assert self.view(request).data.get("count") == 1
 
+    def test_by_geocode(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        request = self.factory.get(
+            "events/search/"
+            "?distance=10&geo_x=54.34950&geo_y=18.64847"
+        )
+
+        assert self.view(request).data.get("count") == 1
+
+    def test_all_query_params(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(name="xd", address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        request = self.factory.get(
+            "events/search/"
+            "?distance=10&geo_x=54.34950&geo_y=18.64847"
+            "&search=test"
+            "&date_from=2020-1-1&date_to=2031-1-1"
+        )
+        assert self.view(request).data.get("count") == 1
+
 
 @pytest.mark.django_db
 class TestAddressViewSet(TestCase):
