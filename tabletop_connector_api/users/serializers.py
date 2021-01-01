@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import User, Profile
-from ..config.common import MEDIA_ROOT
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -16,7 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_avatar(self, profile):
         request = self.context.get("request")
         if profile and hasattr(profile, "avatar"):
-            avatar = '/api' + profile.avatar.url
+            avatar = "/api" + profile.avatar.url
             return request.build_absolute_uri(avatar)
         else:
             return None

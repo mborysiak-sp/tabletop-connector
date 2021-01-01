@@ -203,8 +203,7 @@ class TestCustomEventViewSet(TestCase):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
         request = self.factory.get(
-            "events/search/"
-            "?distance=10&geo_x=54.34950&geo_y=18.64847"
+            "events/search/" "?distance=10&geo_x=54.34950&geo_y=18.64847"
         )
 
         assert self.view(request).data.get("count") == 1
@@ -252,15 +251,11 @@ class TestEventViewSet(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = UserFactory()
-        self.example = {"name": "TEST 1",
-                        "date": "2020-12-30T16:01:00+0000",
-                        "address":
-                            {
-                                "geo_x": 54.395704550000005,
-                                "geo_y": 18.5739726651911
-                            }
-                        }
-
+        self.example = {
+            "name": "TEST 1",
+            "date": "2020-12-30T16:01:00+0000",
+            "address": {"geo_x": 54.395704550000005, "geo_y": 18.5739726651911},
+        }
 
     def test_get_all_events(self):
         EventFactory()
