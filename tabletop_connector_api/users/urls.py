@@ -15,6 +15,6 @@ urlpatterns = [
     path("auth/", include("djoser.urls.authtoken")),
     path("profiles/me/", ProfileMeAPIView.as_view()),
 ]
-urlpatterns += staticfiles_urlpatterns()
+# urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static('/media/', document_root=MEDIA_ROOT)
 urlpatterns += router.urls
