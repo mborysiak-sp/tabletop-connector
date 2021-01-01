@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.shortcuts import get_object_or_404
 from rest_framework import filters
 
 from tabletop_connector_api.events.models import Event
@@ -7,12 +8,25 @@ from tabletop_connector_api.events.utils import (
     address_to_geocode,
     get_distance_in_kilometers,
 )
+from tabletop_connector_api.users.models import User
 
 
 def unpack_from_list(dictionary: dict, key):
     val = dictionary.get(key, None)
     if isinstance(val, list):
         dictionary[key] = dictionary.get(key)[0]
+
+
+class FilterByParticipation(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user_pk = request.query_params.get("participant", None)
+        print(user_pk)
+        if not user_pk or not queryset:
+            return queryset
+
+        this_user = get_object_or_404(User, pk=user_pk)
+        queryset = queryset.filter(participants=this_user)
+        return queryset
 
 
 class FilterByDistance(filters.BaseFilterBackend):
