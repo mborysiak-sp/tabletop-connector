@@ -7,7 +7,7 @@ from rest_framework.decorators import (
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from .filters import FilterByDistance, FilterByDate
+from .filters import FilterByDistance, FilterByDate, FilterByParticipation
 from .models import Address, Event, Game
 from .serializers import (
     AddressSerializer,
@@ -55,6 +55,7 @@ class CustomEventAPIView(ListAPIView):
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
     filter_backends = [
+        FilterByParticipation,
         filters.SearchFilter,
         FilterByDate,
         FilterByDistance,

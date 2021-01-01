@@ -208,12 +208,36 @@ class TestCustomEventViewSet(TestCase):
 
         assert self.view(request).data.get("count") == 1
 
-    def test_all_query_params(self):
+    def test_by_participant(self):
+        usr1 = UserFactory()
+        usr2 = UserFactory(username="xd")
+        usr3 = UserFactory(username="xd2")
+        ev1 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        ev2 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        ev3 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        ev1.participants.add(usr1)
+        ev3.participants.add(usr1, usr3)
+        ev2.participants.add(usr2)
+
+        request = self.factory.get("events/search/" f"?participant={usr1.pk}")
+        assert self.view(request).data.get("count") == 2
+
+    def test_by_not_existing_participant(self):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        request = self.factory.get(
+            "events/search/" "?participant=123e4567-e89b-12d3-a456-426614174000"
+        )
+        assert self.view(request).status_code == 404
+
+    def test_all_query_params(self):
+        usr1 = UserFactory()
+        ev = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
         EventFactory(name="xd", address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        ev.participants.add(usr1)
         request = self.factory.get(
             "events/search/"
             "?distance=10&geo_x=54.34950&geo_y=18.64847"
+            f"&participant={usr1.pk}"
             "&search=test"
             "&date_from=2020-1-1&date_to=2031-1-1"
         )
