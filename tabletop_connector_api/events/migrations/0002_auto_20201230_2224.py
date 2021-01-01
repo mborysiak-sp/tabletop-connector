@@ -12,75 +12,124 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('events', '0001_initial'),
+        ("events", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Game',
+            name="Game",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=512)),
-                ('image', models.CharField(max_length=512)),
-                ('thumbnail', models.CharField(max_length=512)),
-                ('min_players', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)])),
-                ('max_players', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)])),
-                ('playtime', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(1000)])),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=512)),
+                ("image", models.CharField(max_length=512)),
+                ("thumbnail", models.CharField(max_length=512)),
+                (
+                    "min_players",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(100),
+                        ]
+                    ),
+                ),
+                (
+                    "max_players",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(100),
+                        ]
+                    ),
+                ),
+                (
+                    "playtime",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(1000),
+                        ]
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='address',
-            name='geo_x',
+            model_name="address",
+            name="geo_x",
             field=models.FloatField(blank=True, default=0.0),
         ),
         migrations.AddField(
-            model_name='address',
-            name='geo_y',
+            model_name="address",
+            name="geo_y",
             field=models.FloatField(blank=True, default=0.0),
         ),
         migrations.AddField(
-            model_name='event',
-            name='participants',
-            field=models.ManyToManyField(related_name='participants', to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="participants",
+            field=models.ManyToManyField(
+                related_name="participants", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='city',
+            model_name="address",
+            name="city",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='country',
+            model_name="address",
+            name="country",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='number',
+            model_name="address",
+            name="number",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='postal_code',
+            model_name="address",
+            name="postal_code",
             field=models.CharField(blank=True, max_length=6),
         ),
         migrations.AlterField(
-            model_name='address',
-            name='street',
+            model_name="address",
+            name="street",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='chat',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='events.chat'),
+            model_name="event",
+            name="chat",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="events.chat",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='creator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="creator",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='games',
-            field=models.ManyToManyField(blank=True, related_name='games', related_query_name='games', to='events.Game'),
+            model_name="event",
+            name="games",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="games",
+                related_query_name="games",
+                to="events.Game",
+            ),
         ),
     ]
