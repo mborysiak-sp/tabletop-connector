@@ -3,7 +3,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ProfileViewSet, ProfileMeAPIView, TokenObtainView
-from ..config.common import MEDIA_ROOT
+from ..config.common import MEDIA_ROOT, MEDIA_URL
 
 router = DefaultRouter()
 router.register(r"profiles", ProfileViewSet)
@@ -16,5 +16,5 @@ urlpatterns = [
     path("profiles/me/", ProfileMeAPIView.as_view()),
 ]
 # urlpatterns += staticfiles_urlpatterns()
-urlpatterns += static('/media/', document_root=MEDIA_ROOT)
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 urlpatterns += router.urls
