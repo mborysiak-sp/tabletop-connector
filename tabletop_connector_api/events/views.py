@@ -1,17 +1,13 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status, filters, generics
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import (
     action,
     api_view,
-    permission_classes,
-    authentication_classes,
 )
 from rest_framework.generics import ListAPIView
-from rest_framework.mixins import UpdateModelMixin
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from .filters import FilterByDistance, FilterByDate
+from .filters import FilterByDistance, FilterByDate, FilterByParticipation
 from .models import Address, Event, Game
 from .serializers import (
     AddressSerializer,
@@ -59,6 +55,7 @@ class CustomEventAPIView(ListAPIView):
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
     filter_backends = [
+        FilterByParticipation,
         filters.SearchFilter,
         FilterByDate,
         FilterByDistance,
@@ -80,13 +77,15 @@ class CustomEventAPIView(ListAPIView):
     def list(self, *args, **kwargs):
 
         queryset = self.filter_queryset(self.get_queryset())
-        if queryset.count() == 0:
-            return Response(None, status=status.HTTP_204_NO_CONTENT)
-        else:
-            serializer = self.serializer_class(queryset, many=True)
-            page = self.paginate_queryset(queryset=serializer.data)
+        # if queryset.count() == 0:
+        #     return Response(None, status=status.HTTP_204_NO_CONTENT)
+        # else:
+        context = {"request": self.request}
+        serializer = self.serializer_class(queryset, context=context, many=True)
 
-            return self.get_paginated_response(page)
+        page = self.paginate_queryset(queryset=serializer.data)
+
+        return self.get_paginated_response(page)
 
 
 class GameViewSet(viewsets.ReadOnlyModelViewSet):

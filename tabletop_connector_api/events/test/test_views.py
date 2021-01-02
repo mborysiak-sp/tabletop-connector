@@ -97,7 +97,7 @@ class TestCustomEventViewSet(TestCase):
         )
         request = self.factory.get("events/search/?distance=10&geo_x=1.0&geo_y=1.0")
 
-        assert self.view(request).data is None
+        assert self.view(request).data.get("count") == 0
 
     def test_not_found_response_code(self):
         EventFactory(
@@ -113,7 +113,7 @@ class TestCustomEventViewSet(TestCase):
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
 
-        assert self.view(request).status_code == 204
+        assert self.view(request).status_code == 200
 
     def test_when_no_distance_specified(self):
         EventFactory(
@@ -130,7 +130,7 @@ class TestCustomEventViewSet(TestCase):
         )
         request = self.factory.get("events/search/?distance=10")
 
-        assert self.view(request).status_code == 204
+        assert self.view(request).status_code == 200
 
     def test_search(self):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -164,7 +164,7 @@ class TestCustomEventViewSet(TestCase):
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2031-1-1"
         )
 
-        assert not self.view(request).data
+        assert self.view(request).data.get("count") == 0
 
     def test_with_date_to_found(self):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -184,7 +184,7 @@ class TestCustomEventViewSet(TestCase):
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2011-1-1"
         )
 
-        assert not self.view(request).data
+        assert self.view(request).data.get("count") == 0
 
     def test_with_date_from_and_date_to_found(self):
         EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
@@ -197,6 +197,50 @@ class TestCustomEventViewSet(TestCase):
             "?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2020-1-1&date_to=2031-1-1"
         )
 
+        assert self.view(request).data.get("count") == 1
+
+    def test_by_geocode(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        request = self.factory.get(
+            "events/search/" "?distance=10&geo_x=54.34950&geo_y=18.64847"
+        )
+
+        assert self.view(request).data.get("count") == 1
+
+    def test_by_participant(self):
+        usr1 = UserFactory()
+        usr2 = UserFactory(username="xd")
+        usr3 = UserFactory(username="xd2")
+        ev1 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        ev2 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        ev3 = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=21.64847))
+        ev1.participants.add(usr1)
+        ev3.participants.add(usr1, usr3)
+        ev2.participants.add(usr2)
+
+        request = self.factory.get("events/search/" f"?participant={usr1.pk}")
+        assert self.view(request).data.get("count") == 2
+
+    def test_by_not_existing_participant(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        request = self.factory.get(
+            "events/search/" "?participant=123e4567-e89b-12d3-a456-426614174000"
+        )
+        assert self.view(request).status_code == 404
+
+    def test_all_query_params(self):
+        usr1 = UserFactory()
+        ev = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        EventFactory(name="xd", address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        ev.participants.add(usr1)
+        request = self.factory.get(
+            "events/search/"
+            "?distance=10&geo_x=54.34950&geo_y=18.64847"
+            f"&participant={usr1.pk}"
+            "&search=test"
+            "&date_from=2020-1-1&date_to=2031-1-1"
+        )
         assert self.view(request).data.get("count") == 1
 
 
@@ -231,15 +275,11 @@ class TestEventViewSet(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = UserFactory()
-        self.example = {"name": "TEST 1",
-                        "date": "2020-12-30T16:01:00+0000",
-                        "address":
-                            {
-                                "geo_x": 54.395704550000005,
-                                "geo_y": 18.5739726651911
-                            }
-                        }
-
+        self.example = {
+            "name": "TEST 1",
+            "date": "2020-12-30T16:01:00+0000",
+            "address": {"geo_x": 54.395704550000005, "geo_y": 18.5739726651911},
+        }
 
     def test_get_all_events(self):
         EventFactory()

@@ -15,7 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_avatar(self, profile):
         request = self.context.get("request")
         if profile and hasattr(profile, "avatar"):
-            avatar = profile.avatar.url
+            avatar = "/api" + profile.avatar.url
             return request.build_absolute_uri(avatar)
         else:
             return None
