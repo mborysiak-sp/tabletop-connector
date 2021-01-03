@@ -9,7 +9,6 @@ from .models import Message
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         if self.scope["user"].is_authenticated():
-
             self.chat_id = self.scope["url_route"]["kwargs"]["room_name"]
             self.room_name = "chat"
             self.room_group_name = f"{self.room_name}_{self.chat_id}"
@@ -36,9 +35,11 @@ class ChatConsumer(WebsocketConsumer):
         )
 
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "chat_message", "message": message}
+            self.room_group_name,
+            {"type": "chat_message", "message": message, "handle": handle},
         )
 
     def chat_message(self, event):
         message = event["message"]
-        self.send(text_data=json.dumps({"message": message}))
+        handle = event["handle"]
+        self.send(text_data=json.dumps({"message": message, "handle": handle}))
