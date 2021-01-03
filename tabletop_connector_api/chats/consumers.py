@@ -3,13 +3,16 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from .models import Message
+from .models import Message, Chat
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        if self.scope["user"].is_authenticated():
-            self.chat_id = self.scope["url_route"]["kwargs"]["room_name"]
+        self.chat_id = self.scope["url_route"]["kwargs"]["room_name"]
+        chat = Chat.objects.get(self.chat_id)
+        user = self.scope["user"]
+
+        if user in chat.users and user.is_authenticated():
             self.room_name = "chat"
             self.room_group_name = f"{self.room_name}_{self.chat_id}"
 
