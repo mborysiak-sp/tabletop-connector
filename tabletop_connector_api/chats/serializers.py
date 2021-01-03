@@ -5,17 +5,20 @@ from .models import Message
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('id', 'handle', 'content', 'chat')
+        fields = ("id", "handle", "content", "chat")
         model = Message
 
 
 class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('handle', 'content', 'chat')
+        fields = ("handle", "content", "chat")
         model = Message
 
 
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('id', 'users', )
+        fields = (
+            "id",
+            "users",
+        )
         model = Message
