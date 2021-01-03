@@ -42,9 +42,9 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         serializer.save(
-            creator=self.request.user,
+            creator=user,
             participants=[
-                self.request.user,
+                user,
             ],
         )
 
@@ -108,9 +108,11 @@ def join_leave_event(request, pk):
 
     if request.user in event.participants.all():
         event.participants.remove(request.user)
+        event.chat.users.remove(request.user)
 
     else:
         event.participants.add(request.user)
+        event.chat.users.add(request.user)
 
     event.save()
     return Response(None, status.HTTP_200_OK)
