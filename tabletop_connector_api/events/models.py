@@ -71,3 +71,9 @@ class Event(models.Model):
             + " "
             + self.address.__str__()
         )
+
+    def save(self, *args, **kwargs):
+        chat = Chat.objects.create(users=self.participants)
+        self.chat = chat
+
+        super().save(*args, **kwargs)
