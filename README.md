@@ -15,7 +15,6 @@ Start the dev server for local development:
 ```bash
 docker-compose up
 ```
-
 Get games from API:
 ```bash
 docker-compose run web python games_downloader.py
