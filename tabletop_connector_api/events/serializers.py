@@ -91,7 +91,7 @@ class EventCreateSerializer(WritableNestedModelSerializer):
     address = AddressCreateSerializer(many=False)
     participants = UserSerializer(many=True, read_only=True)
     creator = UserSerializer(many=False, read_only=True)
-    games = GameSerializer(many=True, read_only=False)
+    games = GameSerializer(many=True, read_only=False, default=[])
 
     class Meta:
         model = Event
