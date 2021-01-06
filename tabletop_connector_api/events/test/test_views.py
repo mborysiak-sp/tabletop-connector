@@ -279,6 +279,7 @@ class TestEventViewSet(TestCase):
             "name": "TEST 1",
             "date": "2020-12-30T16:01:00+0000",
             "address": {"geo_x": 54.395704550000005, "geo_y": 18.5739726651911},
+            "games": []
         }
 
     def test_get_all_events(self):
