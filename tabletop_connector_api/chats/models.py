@@ -7,7 +7,7 @@ from ..users.models import User
 
 class Chat(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    users = models.ManyToManyField(User, blank=True, null=True, related_name="chats")
+    users = models.ManyToManyField(User, blank=True, related_name="chats")
 
 
 class Message(models.Model):
