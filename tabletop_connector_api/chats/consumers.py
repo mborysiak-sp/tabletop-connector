@@ -31,18 +31,30 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json["message"]
         handle = text_data_json["handle"]
 
-        Message.objects.create(
+        message = Message.objects.create(
             content=message,
             handle=handle,
             chat=self.chat_id,
         )
 
+        timestamp = message.timestamp
+
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
-            {"type": "chat_message", "message": message, "handle": handle},
+            {
+                "type": "chat_message",
+                "message": message,
+                "handle": handle,
+                "timestamp": timestamp,
+            },
         )
 
     def chat_message(self, event):
         message = event["message"]
         handle = event["handle"]
-        self.send(text_data=json.dumps({"message": message, "handle": handle}))
+        timestamp = event["timestamp"]
+        self.send(
+            text_data=json.dumps(
+                {"message": message, "handle": handle, "timestamp": timestamp}
+            )
+        )
