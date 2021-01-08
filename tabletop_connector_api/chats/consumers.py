@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 from .models import Message, Chat
+from ..users.models import User
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -30,7 +31,7 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         handle = text_data_json["handle"]
-
+        name = User.objects.get(pk=handle).username
         message = Message.objects.create(
             content=message,
             handle=handle,
@@ -45,6 +46,7 @@ class ChatConsumer(WebsocketConsumer):
                 "type": "chat_message",
                 "message": message,
                 "handle": handle,
+                "username": name,
                 "timestamp": timestamp,
             },
         )
@@ -53,8 +55,9 @@ class ChatConsumer(WebsocketConsumer):
         message = event["message"]
         handle = event["handle"]
         timestamp = event["timestamp"]
+        username = event["username"]
         self.send(
             text_data=json.dumps(
-                {"message": message, "handle": handle, "timestamp": timestamp}
+                {"message": message, "handle": handle, "username": username, "timestamp": timestamp}
             )
         )
