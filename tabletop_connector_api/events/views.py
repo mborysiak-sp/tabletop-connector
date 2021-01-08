@@ -108,11 +108,11 @@ def join_leave_event(request, pk):
 
     if request.user in event.participants.all():
         event.participants.remove(request.user)
-        event.chat.users.remove(request.user)
+        event.chat.participants.remove(request.user)
 
     else:
         event.participants.add(request.user)
-        event.chat.users.add(request.user)
+        event.chat.participants.add(request.user)
 
     event.save()
     return Response(None, status.HTTP_200_OK)

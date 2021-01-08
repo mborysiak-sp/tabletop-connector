@@ -13,7 +13,7 @@ class ChatConsumer(WebsocketConsumer):
         chat = Chat.objects.get(self.chat_id)
         user = self.scope["user"]
 
-        if user in chat.users and user.is_authenticated():
+        if user in chat.participants and user.is_authenticated():
             self.room_name = "chat"
             self.room_group_name = f"{self.room_name}_{self.chat_id}"
 
