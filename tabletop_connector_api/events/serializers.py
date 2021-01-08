@@ -101,7 +101,6 @@ class EventCreateSerializer(WritableNestedModelSerializer):
             "creator",
             "participants",
             "chat",
-            # "games",
         )
         fields = (
             "id",
