@@ -75,7 +75,8 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        chat = Chat.objects.create(users=self.participants)
+        chat = Chat.objects.create()
+        chat.users.set(self.participants)
         self.chat = chat
 
 
