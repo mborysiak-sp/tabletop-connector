@@ -42,7 +42,9 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        participants = [user, ]
+        participants = [
+            user,
+        ]
         chat = Chat()
         chat.save()
         chat.participants.set(participants)

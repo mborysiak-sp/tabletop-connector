@@ -27,7 +27,6 @@ class ChatFactory(DjangoModelFactory):
         model = Chat
 
 
-
 class EventFactory(DjangoModelFactory):
     class Meta:
         model = Event
@@ -42,4 +41,3 @@ class EventFactory(DjangoModelFactory):
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
-

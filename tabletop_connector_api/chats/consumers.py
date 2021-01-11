@@ -58,6 +58,11 @@ class ChatConsumer(WebsocketConsumer):
         username = event["username"]
         self.send(
             text_data=json.dumps(
-                {"message": message, "handle": handle, "username": username, "timestamp": timestamp}
+                {
+                    "message": message,
+                    "handle": handle,
+                    "username": username,
+                    "timestamp": timestamp,
+                }
             )
         )

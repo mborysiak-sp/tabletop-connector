@@ -77,5 +77,3 @@ class Event(models.Model):
     #     chat = Chat.objects.create()
     #     chat.participants.set(self.participants.all())
     #     self.chat = chat
-
-

@@ -45,5 +45,9 @@ class TokenObtainView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
-        custom_response = {"auth_token": token.key, "user_id": user.id, "firstname": user.profile.firstname}
+        custom_response = {
+            "auth_token": token.key,
+            "user_id": user.id,
+            "firstname": user.profile.firstname,
+        }
         return Response(custom_response)
