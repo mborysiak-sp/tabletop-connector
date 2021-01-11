@@ -16,6 +16,7 @@ from .serializers import (
     AddressCreateSerializer,
     GameSerializer,
 )
+from ..chats.models import Chat
 
 
 class AddressViewSet(viewsets.ModelViewSet):
@@ -41,11 +42,14 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        participants = [user, ]
+        chat = Chat()
+        chat.save()
+        chat.participants.set(participants)
         serializer.save(
             creator=user,
-            participants=[
-                user,
-            ],
+            participants=participants,
+            chat=chat,
         )
 
 

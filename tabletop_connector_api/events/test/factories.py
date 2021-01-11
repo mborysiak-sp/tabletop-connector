@@ -4,6 +4,7 @@ import pytz
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 
+from tabletop_connector_api.chats.models import Chat
 from tabletop_connector_api.events.models import Address, Event
 from tabletop_connector_api.users.models import User
 
@@ -21,6 +22,12 @@ class AddressFactory(DjangoModelFactory):
     geo_y = 0
 
 
+class ChatFactory(DjangoModelFactory):
+    class Meta:
+        model = Chat
+
+
+
 class EventFactory(DjangoModelFactory):
     class Meta:
         model = Event
@@ -29,9 +36,10 @@ class EventFactory(DjangoModelFactory):
     date = datetime(2025, 12, 25, 11, 0, tzinfo=pytz.UTC)
     creator = None
     address = SubFactory(AddressFactory)
-    chat = None
+    chat = SubFactory(ChatFactory)
 
 
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
+

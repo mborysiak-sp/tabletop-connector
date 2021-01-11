@@ -72,10 +72,10 @@ class Event(models.Model):
             + self.address.__str__()
         )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        chat = Chat.objects.create()
-        chat.participants.set(self.participants.all())
-        self.chat = chat
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     chat = Chat.objects.create()
+    #     chat.participants.set(self.participants.all())
+    #     self.chat = chat
 
 
