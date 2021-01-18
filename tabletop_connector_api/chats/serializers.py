@@ -5,7 +5,7 @@ from .models import Message, Chat
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ("id", "handle", "content", "chat")
+        fields = ("id", "handle", "content", "timestamp")
         model = Message
 
 
@@ -16,9 +16,12 @@ class MessageCreateSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
+    messages = MessageSerializer(many=True)
+
     class Meta:
         fields = (
             "id",
             "participants",
+            "messages"
         )
         model = Chat
