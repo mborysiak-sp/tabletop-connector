@@ -68,7 +68,7 @@ class CustomEventAPIView(ListAPIView):
         filters.OrderingFilter,
     ]
     search_fields = [
-        "name",
+        "name", "games__name"
     ]  # describe here which fields want to use for searching, then we use search=*
     ordering_fields = [
         "date",

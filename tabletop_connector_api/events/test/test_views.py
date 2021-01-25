@@ -15,7 +15,7 @@ from tabletop_connector_api.events.serializers import (
 from tabletop_connector_api.events.test.factories import (
     EventFactory,
     AddressFactory,
-    UserFactory,
+    UserFactory, GameFactory,
 )
 from tabletop_connector_api.events.views import (
     CustomEventAPIView,
@@ -138,6 +138,17 @@ class TestCustomEventViewSet(TestCase):
         EventFactory(name="xyz", address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
         request = self.factory.get(
             "events/search/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna"
+        )
+
+        assert self.view(request).data.get("count") == 1
+
+    def test_search_by_game_name(self):
+        EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+
+        ev = EventFactory(address=AddressFactory(geo_x=54.34950, geo_y=18.64847))
+        ev.games.add(GameFactory())
+        request = self.factory.get(
+            "events/search/?search=qq&distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
 
         assert self.view(request).data.get("count") == 1
