@@ -19,7 +19,9 @@ INSTALLED_APPS = [
     "django_filters",  # for filtering rest endpoints
     "djoser",
     "drf_yasg",
+    "channels",
     # Project apps
+    "tabletop_connector_api.chats",
     "tabletop_connector_api.users",
     "tabletop_connector_api.events",
 ]
@@ -39,6 +41,7 @@ ALLOWED_HOSTS = ["*"]
 ROOT_URLCONF = "tabletop_connector_api.urls"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default="2137")
 WSGI_APPLICATION = "tabletop_connector_api.wsgi.application"
+ASGI_APPLICATION = "tabletop_connector_api.asgi.application"
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -191,4 +194,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
 }

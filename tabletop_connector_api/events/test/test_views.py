@@ -279,7 +279,7 @@ class TestEventViewSet(TestCase):
             "name": "TEST 1",
             "date": "2020-12-30T16:01:00+0000",
             "address": {"geo_x": 54.395704550000005, "geo_y": 18.5739726651911},
-            "games": []
+            "games": [],
         }
 
     def test_get_all_events(self):
@@ -447,6 +447,26 @@ class TestEventViewSet(TestCase):
 
         assert self.view(request, pk=event.pk).status_code == 401
 
+    def test_chat_not_null_when_event_created(self):
+        request = self.factory.post(
+            reverse("events:event-list"), self.example, format="json"
+        )
+        force_authenticate(request, user=self.user)
+        self.view(request)
+
+        assert Event.objects.get(creator=self.user.pk).chat is not None
+
+    def test_creator_as_chat_participant(self):
+        request = self.factory.post(
+            reverse("events:event-list"), self.example, format="json"
+        )
+        force_authenticate(request, user=self.user)
+        self.view(request)
+
+        assert (
+            self.user in Event.objects.get(creator=self.user.pk).chat.participants.all()
+        )
+
 
 @pytest.mark.django_db
 class TestJoinLeaveEvent(TestCase):
@@ -463,30 +483,34 @@ class TestJoinLeaveEvent(TestCase):
 
         assert self.view(request, pk=event.pk).status_code == 200
 
-    def test_if_joined_not_creator_in_participants(self):
+    def test_if_joined_participant_in_participants_and_chat(self):
         event = EventFactory(creator=self.user)
         request = self.factory.patch("api/participation/")
         force_authenticate(request, user=self.user_2)
         self.view(request, pk=event.pk)
 
         assert self.user_2 in event.participants.all()
+        assert self.user_2 in event.chat.participants.all()
 
-    def test_if_left_not_creator(self):
+    def test_if_left_participant(self):
         event = EventFactory(creator=self.user)
         event.participants.add(self.user_2)
         request = self.factory.patch("api/participation/")
         force_authenticate(request, user=self.user_2)
+
         assert self.view(request, pk=event.pk).status_code == 200
 
-    def test_if_left_not_creator_not_in_participants(self):
+    def test_if_left_not_creator_not_in_participants_and_chat(self):
         event = EventFactory(creator=self.user)
         event.participants.add(self.user_2)
         request = self.factory.patch("api/participation/")
         force_authenticate(request, user=self.user_2)
         self.view(request, pk=event.pk)
-        assert self.user_2 not in event.participants.all()
 
-    def test_if_owner(self):
+        assert self.user_2 not in event.participants.all()
+        assert self.user_2 not in event.chat.participants.all()
+
+    def test_if_owner_status_code(self):
         event = EventFactory(creator=self.user)
         request = self.factory.patch("api/participation/")
         force_authenticate(request, user=self.user)

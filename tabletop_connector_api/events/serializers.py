@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from .models import Address, Event, Game
 from .utils import address_to_geocode, geocode_to_address
+from ..chats.serializers import ChatSerializer
 from ..users.serializers import UserSerializer
 
 
@@ -100,7 +101,6 @@ class EventCreateSerializer(WritableNestedModelSerializer):
             "creator",
             "participants",
             "chat",
-            # "games",
         )
         fields = (
             "id",
@@ -119,6 +119,7 @@ class EventSerializer(serializers.ModelSerializer):
     participants = UserSerializer(many=True)
     creator = UserSerializer(many=False)
     games = GameSerializer(many=True)
+    chat = ChatSerializer(many=False)
 
     class Meta:
         model = Event

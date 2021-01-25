@@ -16,6 +16,7 @@ from .serializers import (
     AddressCreateSerializer,
     GameSerializer,
 )
+from ..chats.models import Chat
 
 
 class AddressViewSet(viewsets.ModelViewSet):
@@ -41,11 +42,16 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        participants = [
+            user,
+        ]
+        chat = Chat()
+        chat.save()
+        chat.participants.set(participants)
         serializer.save(
-            creator=self.request.user,
-            participants=[
-                self.request.user,
-            ],
+            creator=user,
+            participants=participants,
+            chat=chat,
         )
 
 
@@ -108,9 +114,11 @@ def join_leave_event(request, pk):
 
     if request.user in event.participants.all():
         event.participants.remove(request.user)
+        event.chat.participants.remove(request.user)
 
     else:
         event.participants.add(request.user)
+        event.chat.participants.add(request.user)
 
     event.save()
     return Response(None, status.HTTP_200_OK)

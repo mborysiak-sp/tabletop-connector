@@ -7,6 +7,7 @@ from drf_yasg import openapi
 
 from .users import urls as user_urls
 from .events import urls as event_urls
+from .chats import urls as chat_urls
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -26,6 +27,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(user_urls)),
     path("api/", include(event_urls)),
+    path("api/", include(chat_urls)),
     url(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=1000),

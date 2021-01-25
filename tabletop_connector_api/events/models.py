@@ -3,8 +3,8 @@ import uuid
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-
-from tabletop_connector_api.users.models import User
+from ..chats.models import Chat
+from ..users.models import User
 
 
 class Address(models.Model):
@@ -33,10 +33,6 @@ class Address(models.Model):
             + " "
             + self.geo_y.__str__()
         )
-
-
-class Chat(models.Model):
-    pass
 
 
 class Game(models.Model):
@@ -75,3 +71,9 @@ class Event(models.Model):
             + " "
             + self.address.__str__()
         )
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     chat = Chat.objects.create()
+    #     chat.participants.set(self.participants.all())
+    #     self.chat = chat
