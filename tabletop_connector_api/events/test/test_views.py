@@ -35,6 +35,7 @@ class TestCustomEventViewSet(TestCase):
     def setUp(self):
         self.view = CustomEventAPIView.as_view()
         self.factory = APIRequestFactory()
+        self.user = UserFactory(username="bambo")
 
     def test_serializer_class(self):
         self.assertEqual(CustomEventAPIView.serializer_class, EventSerializer)
@@ -44,6 +45,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 200
 
@@ -62,6 +64,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -80,6 +83,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&geo_x=51.09421&geo_y=17.02858"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -96,6 +100,7 @@ class TestCustomEventViewSet(TestCase):
             )
         )
         request = self.factory.get("events/search/?distance=10&geo_x=1.0&geo_y=1.0")
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 0
 
@@ -112,6 +117,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 200
 
@@ -122,6 +128,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
         assert self.view(request).data.get("count") == 1
 
     def test_when_address_no_specified(self):
@@ -129,6 +136,7 @@ class TestCustomEventViewSet(TestCase):
             address=AddressFactory(city="Wroclaw", street="Sanocka", number="9")
         )
         request = self.factory.get("events/search/?distance=10")
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).status_code == 200
 
@@ -139,6 +147,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?search=x&distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -150,6 +159,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?search=qq&distance=10&country=Poland&city=Gdansk&street=Teatralna"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -163,6 +173,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2011-1-1"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -174,6 +185,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2031-1-1"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 0
 
@@ -186,6 +198,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2031-1-1"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -194,6 +207,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_to=2011-1-1"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 0
 
@@ -207,6 +221,7 @@ class TestCustomEventViewSet(TestCase):
             "events/search/"
             "?distance=10&country=Poland&city=Gdansk&street=Teatralna&date_from=2020-1-1&date_to=2031-1-1"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -216,6 +231,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/" "?distance=10&geo_x=54.34950&geo_y=18.64847"
         )
+        force_authenticate(request, user=self.user)
 
         assert self.view(request).data.get("count") == 1
 
@@ -231,6 +247,7 @@ class TestCustomEventViewSet(TestCase):
         ev2.participants.add(usr2)
 
         request = self.factory.get("events/search/" f"?participant={usr1.pk}")
+        force_authenticate(request, user=self.user)
         assert self.view(request).data.get("count") == 2
 
     def test_by_not_existing_participant(self):
@@ -238,6 +255,7 @@ class TestCustomEventViewSet(TestCase):
         request = self.factory.get(
             "events/search/" "?participant=123e4567-e89b-12d3-a456-426614174000"
         )
+        force_authenticate(request, user=self.user)
         assert self.view(request).status_code == 404
 
     def test_all_query_params(self):
@@ -252,6 +270,7 @@ class TestCustomEventViewSet(TestCase):
             "&search=test"
             "&date_from=2020-1-1&date_to=2031-1-1"
         )
+        force_authenticate(request, user=self.user)
         assert self.view(request).data.get("count") == 1
 
 

@@ -56,8 +56,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
 
 class CustomEventAPIView(ListAPIView):
-    authentication_classes = ()
-    permission_classes = ()
+
     serializer_class = EventSerializer
     model = serializer_class.Meta.model
     filter_backends = [
