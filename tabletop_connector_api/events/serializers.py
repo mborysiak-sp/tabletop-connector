@@ -100,7 +100,6 @@ class EventCreateSerializer(WritableNestedModelSerializer):
             "id",
             "creator",
             "participants",
-            "chat",
         )
         fields = (
             "id",
@@ -109,7 +108,6 @@ class EventCreateSerializer(WritableNestedModelSerializer):
             "address",
             "participants",
             "creator",
-            "chat",
             "games",
         )
 
